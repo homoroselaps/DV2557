@@ -201,17 +201,22 @@ public class ServerGUI implements ActionListener
         {
             try
             {
-                KalahaServer s = KalahaServer.getInstance();
-                s.stop();
-                int p = Integer.parseInt(portField.getText());
-                KalahaMain.port = p;
-                s.start();
+                for (int i = 0; i < 2; i++) {
+                    KalahaServer s = KalahaServer.getInstance();
+                    s.stop();
+                    int p = Integer.parseInt(portField.getText());
+                    KalahaMain.port = p;
+                    s.start();
+                    for (int k = 0; k < 2; k++) {
+                        new Thread(new RandomClient()).start();
+                    }
+                    Thread.sleep(10000);
+                }
             }
             catch (Exception ex)
             {
                 addText("Reconnect failed: " + ex.getMessage());
             }
-            
         }
     }
     

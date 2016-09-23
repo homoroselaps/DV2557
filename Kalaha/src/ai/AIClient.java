@@ -5,6 +5,11 @@ import java.io.*;
 import java.net.*;
 import javax.swing.*;
 import java.awt.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import kalaha.*;
 
 /**
@@ -24,6 +29,7 @@ public class AIClient implements Runnable
     private Socket socket;
     private boolean running;
     private boolean connected;
+    private int firstMove;
     	
     /**
      * Creates a new client.
@@ -133,10 +139,12 @@ public class AIClient implements Runnable
                     if (w == player)
                     {
                         addText("I won!");
+                        saveGame(firstMove, 1);
                     }
                     else
                     {
                         addText("I lost...");
+                        saveGame(firstMove, 0);
                     }
                     running = false;
                 }
@@ -225,5 +233,14 @@ public class AIClient implements Runnable
     public int getRandom()
     {
         return 1 + (int)(Math.random() * 6);
+    }
+
+    private void saveGame(int firstMove, int playerWon) {
+        String line= firstMove+";"+playerWon+"\n";
+        try {
+            Files.write(Paths.get("games.txt"), line.getBytes(), StandardOpenOption.APPEND);
+        } catch (IOException ex) {
+            Logger.getLogger(AIClient.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 }

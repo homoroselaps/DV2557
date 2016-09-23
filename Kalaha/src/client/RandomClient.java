@@ -5,6 +5,11 @@ import java.io.*;
 import java.net.*;
 import javax.swing.*;
 import java.awt.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import kalaha.*;
 
 /**
@@ -23,6 +28,8 @@ public class RandomClient implements Runnable
     private Socket socket;
     private boolean running;
     private boolean connected;
+    private int firstMove;
+    private boolean isFirstMovePlayed = false;
     	
     /**
      * Creates a new random move client.
@@ -100,6 +107,11 @@ public class RandomClient implements Runnable
      */
     public void run()
     {
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException ex) {
+            //aosnut
+        }
         String reply;
         running = true;
         
@@ -127,10 +139,12 @@ public class RandomClient implements Runnable
                     if (w == player)
                     {
                         addText("I won!");
+                        saveGame(firstMove, 1);
                     }
                     else
                     {
                         addText("I lost...");
+                        saveGame(firstMove, 0);
                     }
                     running = false;
                 }
@@ -152,9 +166,11 @@ public class RandomClient implements Runnable
                         out.println(Commands.BOARD);
                         reply = in.readLine();
                         boolean validMove = false;
+                        int move = 0;
                         while (!validMove)
                         {
-                            String cMove = "" + getRandom();
+                            move = getRandom();
+                            String cMove = "" + move;
                             out.println(Commands.MOVE + " " + cMove + " " + player);
                             reply = in.readLine();
                             if (!reply.startsWith("ERROR"))
@@ -162,6 +178,10 @@ public class RandomClient implements Runnable
                                 validMove = true;
                                 addText("Made move " + cMove);
                             }
+                        }
+                        if (!isFirstMovePlayed) {
+                            firstMove = move;
+                            isFirstMovePlayed = true;
                         }
                     }
                 }
@@ -195,5 +215,14 @@ public class RandomClient implements Runnable
     public int getRandom()
     {
         return 1 + (int)(Math.random() * 6);
+    }
+    
+    private void saveGame(int firstMove, int playerWon) {
+        String line= firstMove+";"+playerWon+"\n";
+        try {
+            Files.write(Paths.get("..\\games.txt"), line.getBytes(), StandardOpenOption.APPEND);
+        } catch (IOException ex) {
+            //bla
+        }
     }
 }
