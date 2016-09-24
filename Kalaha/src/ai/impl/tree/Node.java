@@ -8,8 +8,6 @@ import kalaha.GameState;
 import java.util.ArrayList;
 
 
-
-
 /**
  * A node of the {@link Tree}
  * Created by Nejc on 23. 09. 2016.
@@ -17,65 +15,53 @@ import java.util.ArrayList;
 public abstract class Node {
 
 
+    private static final int CHILDREN_LIST_INITIALIZATION = 6;
 
 
-	private static final int CHILDREN_LIST_INITIALIZATION = 6;
+    private final Node parent;
+    private final ArrayList<Node> children = new ArrayList<>(CHILDREN_LIST_INITIALIZATION);
+    private GameState gameState;
+    private int utilityValue;
 
 
+    public Node getParent() {
+        return parent;
+    }
 
 
-	private final Node parent;
-	private final ArrayList<Node> children = new ArrayList<>(CHILDREN_LIST_INITIALIZATION);
-	private GameState gameState;
-	private int utilityValue;
+    public ArrayList<Node> getChildren() {
+        return children;
+    }
 
 
+    public int getUtilityValue() {
+        return utilityValue;
+    }
 
 
-	public
-	@Nullable
-	Node getParent() {
-		return parent;
-	}
+    public boolean hasUtilitlyValue() {
+        return UtilityManager.hasValue(this.utilityValue);
+    }
 
 
-	public ArrayList<Node> getChildren() {
-		return children;
-	}
+    public void setUtilityValue(int value) {
+        this.utilityValue = value;
+    }
 
 
-	public int getUtilityValue() {
-		return utilityValue;
-	}
+    public GameState getGameState() {
+        return gameState;
+    }
 
 
-	public boolean hasUtilitlyValue() {
-		return UtilityManager.hasValue(this.utilityValue);
-	}
+    public void setGameState(GameState gameState) {
+        this.gameState = gameState;
+    }
 
 
-	public void setUtilityValue(int value) {
-		this.utilityValue = value;
-	}
-
-
-	public
-	@Nullable
-	GameState getGameState() {
-		return gameState;
-	}
-
-
-	public void setGameState(GameState gameState) {
-		this.gameState = gameState;
-	}
-
-
-
-
-	public Node(@Nullable Node parent) {
-		this.parent = parent;
-	}
+    public Node(Node parent) {
+        this.parent = parent;
+    }
 
 
 }

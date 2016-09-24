@@ -8,12 +8,12 @@ package ai.impl.tree;
 public class Tree {
 
 
-	private Node root = new MaxNode(null);
+    private Node root = new MaxNode(null);
 
 
-	public Node getRoot() {
-		return root;
-	}
+    public Node getRoot() {
+        return root;
+    }
 
 
 }
