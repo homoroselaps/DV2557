@@ -12,8 +12,7 @@
 hs_err_pid*
 
 # Project files
-Kalaha/build/
-Kalaha/dist/
-Kalaha/nbproject/
-Kalaha/.idea/
-
+Kalaha/build/**
+Kalaha/dist/**
+Kalaha/nbproject/**
+Kalaha/.idea/**
