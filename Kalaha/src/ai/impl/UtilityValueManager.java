@@ -21,6 +21,18 @@ public class UtilityValueManager {
 
 
 	public static final int NO_VALUE = Integer.MIN_VALUE;
+	private static final MinMaxComparator MIN_COMPARATOR = new MinMaxComparator() {
+		@Override
+		public int get(int a, int b) {
+			return Math.min(a, b);
+		}
+	};
+	private static final MinMaxComparator MAX_COMPARATOR = new MinMaxComparator() {
+		@Override
+		public int get(int a, int b) {
+			return Math.max(a, b);
+		}
+	};
 
 
 	private final Tree tree;
@@ -105,9 +117,12 @@ public class UtilityValueManager {
 
 
 	public static MinMaxComparator getComparator(boolean player) {
+//		return player
+//				? Math::max
+//				: Math::min;
 		return player
-				? Math::max
-				: Math::min;
+				? MAX_COMPARATOR
+				: MIN_COMPARATOR;
 	}
 
 
@@ -156,7 +171,7 @@ public class UtilityValueManager {
 
 
 
-	@FunctionalInterface
+	//@FunctionalInterface
 	public interface MinMaxComparator {
 
 

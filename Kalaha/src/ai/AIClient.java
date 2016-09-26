@@ -226,6 +226,7 @@ public class AIClient implements Runnable
 
 		    aiClientManager.run(depthLevelSupplier);
 
+            this.addText("Depth reached: " + aiClientManager.getDepthReached());
 		    return tree.getBestMove().getSelectedAmbo();
 
 	    } catch (Exception ex) {

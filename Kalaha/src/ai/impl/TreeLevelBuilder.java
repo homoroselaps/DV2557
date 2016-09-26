@@ -7,8 +7,7 @@ import ai.impl.structure.Node;
 import ai.impl.structure.Tree;
 import ai.impl.util.Cancellable;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 
 
@@ -211,10 +210,19 @@ public class TreeLevelBuilder implements Runnable, Cancellable {
 
 
 		// sort by descending utility value
-		nodesThatNeedUpdate.sort((o1, o2) -> o1.getUtilityValue() - o2.getUtilityValue());
+		//nodesThatNeedUpdate.sort((o1, o2) -> o1.getUtilityValue() - o2.getUtilityValue());
+		Collections.sort(nodesThatNeedUpdate, new Comparator<Node>() {
+			@Override
+			public int compare(Node o1, Node o2) {
+				return o1.getUtilityValue() - o2.getUtilityValue();
+			}
+		});
 
 		// do the update
-		nodesThatNeedUpdate.forEach(node -> UtilityValueManager.updateNodeAncestorUtilityValues(node));
+		//nodesThatNeedUpdate.forEach(node -> UtilityValueManager.updateNodeAncestorUtilityValues(node));
+		for (Node node : nodesThatNeedUpdate) {
+			UtilityValueManager.updateNodeAncestorUtilityValues(node);
+		}
 
 	}
 

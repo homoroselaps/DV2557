@@ -5,6 +5,8 @@ import ai.impl.PruningManager;
 import ai.impl.UtilityValueManager;
 import kalaha.GameState;
 
+import java.util.List;
+
 
 
 
@@ -99,13 +101,28 @@ public class Tree {
 
 
 	public Node getBestMoveNode() {
-		return root
-				.getChildren()
-				.stream()
-				.max((a, b) -> Integer.compare(b.getUtilityValue(), a.getUtilityValue()))
-				.filter(node -> node.hasUtilityValue())
-				.orElseThrow(() -> new IllegalStateException("No valid node"));
+//		return root
+//				.getChildren()
+//				.stream()
+//				.max((a, b) -> Integer.compare(b.getUtilityValue(), a.getUtilityValue()))
+//				.filter(node -> node.hasUtilityValue())
+//				.orElseThrow(() -> new IllegalStateException("No valid node."));
 
+		List<Node> children = root.getChildren();
+		if (children.size() == 0)
+			throw new IllegalStateException("No nodes available.");
+
+		Node best = children.get(0);
+		for (int i = 1; i < children.size(); i++) {
+			Node node = children.get(i);
+			if (node.getUtilityValue() > best.getUtilityValue())
+				best = node;
+		}
+
+		if (!best.hasUtilityValue())
+			throw new IllegalStateException("No valid node.");
+
+		return best;
 	}
 
 
