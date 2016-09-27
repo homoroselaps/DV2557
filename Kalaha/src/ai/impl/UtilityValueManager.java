@@ -4,6 +4,7 @@ package ai.impl;
 import ai.impl.structure.GameMove;
 import ai.impl.structure.Node;
 import ai.impl.structure.Tree;
+import com.sun.media.jfxmedia.events.PlayerStateEvent;
 import kalaha.GameState;
 
 import java.util.List;
@@ -54,16 +55,26 @@ public class UtilityValueManager {
 
 
 
+//	public int getUtilityValue(GameMove gameMove, boolean previousPlayer) {
+//		GameState gameState = gameMove.getGameState();
+//
+//		int player = tree.getPlayer(previousPlayer);
+//		int opponent = GameUtility.getOpponent(player);
+//
+//		int valuePlayer = gameState.getScore(player);
+//		int valueOpponent = gameState.getScore(opponent);
+//
+//		return valuePlayer - valueOpponent;
+//	}
+
+
 	public int getUtilityValue(GameMove gameMove) {
 		GameState gameState = gameMove.getGameState();
 
-		int player = tree.getPlayer(gameMove.getPlayer());
-		int opponent = GameUtility.getOpponent(player);
+		int valuePlayer = gameState.getScore(tree.getMaxPlayer());
+		int valueOpponent = gameState.getScore(tree.getMinPlayer());
 
-		int valuePlayer = gameState.getScore(player);
-		int valueOpponent = gameState.getScore(opponent);
-
-		return valuePlayer - valueOpponent;
+		return valuePlayer; // - valueOpponent;
 	}
 
 
@@ -73,8 +84,9 @@ public class UtilityValueManager {
 	 * @param node The node
 	 */
 	public void assignFromGameState(Node node) {
-		int utilityValue = getUtilityValue(node.getGameMove());
-		node.setUtilityValue(utilityValue);
+//		int utilityValue = getUtilityValue(node.getGameMove(), node.getParent().getNextPlayer());
+//		node.setUtilityValue(utilityValue);
+		node.setUtilityValue(getUtilityValue(node.getGameMove()));
 	}
 
 

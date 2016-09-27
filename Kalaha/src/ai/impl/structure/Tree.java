@@ -41,6 +41,15 @@ public class Tree {
 	}
 
 
+	public int getMaxPlayer() {
+		return maxPlayer;
+	}
+
+
+	public int getMinPlayer() {
+		return minPlayer;
+	}
+
 
 
 	private Tree(Node root) {
@@ -68,7 +77,7 @@ public class Tree {
 
 
 	public static Tree create(GameState gameState) {
-		GameMove gameMove = GameMove.create(gameState, false);
+		GameMove gameMove = GameMove.create(gameState, true);
 		Node node = new Node(null, gameMove);
 		return new Tree(node);
 	}
@@ -133,7 +142,7 @@ public class Tree {
 
 	@Override
 	public String toString() {
-		return "MaxPlayer: " + maxPlayer + ", MinPlayer: " + minPlayer + ", Root: " + root.toString();
+		return "MaxPlayer: " + maxPlayer + ", MinPlayer: " + minPlayer + ", Root: { " + root.toString() + " }";
 	}
 
 

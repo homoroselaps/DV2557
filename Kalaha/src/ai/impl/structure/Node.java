@@ -5,6 +5,8 @@ import ai.impl.UtilityValueManager;
 
 import java.util.ArrayList;
 
+import static ai.impl.UtilityValueManager.NO_VALUE;
+
 
 
 
@@ -25,7 +27,7 @@ public class Node {
 	private final Node parent;
 	private final ArrayList<Node> children = new ArrayList<>(CHILDREN_LIST_INITIALIZATION);
 	private final GameMove gameMove;
-	private int utilityValue;
+	private int utilityValue = NO_VALUE;
 
 
 
@@ -61,7 +63,7 @@ public class Node {
 
 
 	public void clearUtilityValue() {
-		this.utilityValue = UtilityValueManager.NO_VALUE;
+		this.utilityValue = NO_VALUE;
 	}
 
 
@@ -102,9 +104,15 @@ public class Node {
 	}
 
 
+	public void remove() {
+		if (this.parent != null)
+			this.parent.children.remove(this);
+	}
+
+
 	@Override
 	public String toString() {
-		return "UtilityValue: " + utilityValue + ", Children: " + children.size() + ", GameMove: " + gameMove.toString();
+		return "UtilityValue: " + utilityValue + ", Children: " + children.size() + ", GameMove: { " + gameMove.toString() + " }";
 	}
 
 

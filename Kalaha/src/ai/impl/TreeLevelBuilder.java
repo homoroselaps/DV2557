@@ -148,7 +148,6 @@ public class TreeLevelBuilder implements Runnable, Cancellable {
 	 * @param state The state of the iteration
 	 */
 	private void step(State state) {
-		GameMoveProvider gameMoveProvider = state.getNode().getGameMove().getGameMoveProvider();
 		stepCount++;
 		currentState = state;
 
@@ -157,13 +156,15 @@ public class TreeLevelBuilder implements Runnable, Cancellable {
 
 		if (state.canHaveChildren()) {
 
+			Node node = state.getNode();
 			List<Node> children = state.getNode().getChildren();
 			if (children.size() != 0)
 				children.clear(); // we'll overwrite any existing nodes
 
 			boolean pruned = false;
+			int newLeavesSize = newLeaves.size();
 
-			for (GameMove gameMove : gameMoveProvider) {
+			for (GameMove gameMove : node.getGameMove().getGameMoveProvider()) {
 
 				// create children
 				State child = state.createChild(gameMove);
@@ -173,6 +174,12 @@ public class TreeLevelBuilder implements Runnable, Cancellable {
 				// this node may have requested pruning
 				if (state.shouldPrune()) {
 					pruned = true;
+
+					// we must remove current node from the tree and remove all leaf nodes from newLeaves list
+					node.remove();
+					if (newLeavesSize != leaves.size())
+						newLeaves.subList(newLeavesSize, newLeaves.size()).clear(); // this is the preferred way of removing a range of items (according to Javadoc)
+
 					break;
 				}
 
@@ -186,14 +193,14 @@ public class TreeLevelBuilder implements Runnable, Cancellable {
 			// handle leaf node logic (parent of this node *does* exist)
 			Node node = state.getNode();
 
-			newLeaves.add(node);
-
 			tree.getUtilityValueManager().assignFromGameState(node);
 
 			boolean prune = tree.getPruningManager().resolveNodeValue(node);
 			if (prune) {
 				state.requestPruning();
 				state.updateParentUtilityValue(); // propagate utility value to the parent
+			} else {
+				newLeaves.add(node);
 			}
 
 		}
@@ -353,7 +360,7 @@ public class TreeLevelBuilder implements Runnable, Cancellable {
 
 		@Override
 		public String toString() {
-			return "LevelsToAdd: " + levelsToAdd + ", Prune: " + prune + ", Node: " + node.toString();
+			return "LevelsToAdd: " + levelsToAdd + ", Prune: " + prune + ", Node: { " + node.toString() + " }";
 		}
 
 

@@ -74,7 +74,7 @@ public class PruningManager {
 
 
 	public boolean resolveNodeValue(Node node) {
-		if (node.getParent().getGameMove().getPlayer())
+		if (node.getParent().getGameMove().getNextPlayer())
 			return resolveMaximizerValue(node.getUtilityValue()); // parent is a maximizer
 		else
 			return resolveMinimizerValue(node.getUtilityValue()); // parent is a minimizer

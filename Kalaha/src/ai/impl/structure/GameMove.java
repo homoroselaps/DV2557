@@ -33,17 +33,12 @@ public class GameMove implements Cloneable {
 
 
 	/**
-	 * Retrieves the player, who initiated the move.
+	 * Retrieves the player, who's turn is after the move.
 	 *
 	 * @return The player
 	 */
-	public boolean getPlayer() {
-		return player;
-	}
-
-
 	public boolean getNextPlayer() {
-		return !player;
+		return player;
 	}
 
 
@@ -91,7 +86,7 @@ public class GameMove implements Cloneable {
 
 	@Override
 	public String toString() {
-		return "Player: " + player + ", NextPlayer: " + getNextPlayer() + ", SelectedAmbo: " + selectedAmbo + ", GameState: " + gameState.toString();
+		return "NextPlayer: " + getNextPlayer() + ", GameState: " + gameState.toString();
 	}
 
 
