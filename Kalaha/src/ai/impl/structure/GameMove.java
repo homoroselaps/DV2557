@@ -3,6 +3,8 @@ package ai.impl.structure;
 
 import kalaha.GameState;
 
+import javax.management.remote.SubjectDelegationPermission;
+
 
 
 
@@ -84,6 +86,12 @@ public class GameMove implements Cloneable {
 	@Override
 	protected Object clone() throws CloneNotSupportedException {
 		return new GameMove(gameState.clone(), selectedAmbo, player);
+	}
+
+
+	@Override
+	public String toString() {
+		return "Player: " + player + ", NextPlayer: " + getNextPlayer() + ", SelectedAmbo: " + selectedAmbo + ", GameState: " + gameState.toString();
 	}
 
 

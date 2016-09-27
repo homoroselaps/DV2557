@@ -221,13 +221,16 @@ public class AIClient implements Runnable
 	    try {
 
 		    Tree tree = Tree.create(currentBoard);
-		    DepthLevelSupplier depthLevelSupplier = new StartArrayDepthLevelSupplier(2, 5, 3);
+		    DepthLevelSupplier depthLevelSupplier = StartArrayDepthLevelSupplier.createNoLimit(2, 5, 3);
 		    AIClientManager aiClientManager = AIClientManager.fromTree(tree);
 
 		    aiClientManager.run(depthLevelSupplier);
+            int selectedAmbo = tree.getBestMove().getSelectedAmbo();
 
             this.addText("Depth reached: " + aiClientManager.getDepthReached());
-		    return tree.getBestMove().getSelectedAmbo();
+            this.addText("Selected ambo: " + selectedAmbo);
+
+		    return selectedAmbo;
 
 	    } catch (Exception ex) {
 

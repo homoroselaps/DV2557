@@ -42,9 +42,12 @@ public class TreeBuilder implements Cancellable {
 
 
 	public void cancel() {
+		cancellationPending = true;
 		if (treeLevelBuilder != null) {
-			cancellationPending = true;
-			treeLevelBuilder.cancel();
+			try {
+				treeLevelBuilder.cancel();
+			} catch (Exception ex) {
+			}
 		}
 	}
 
@@ -71,6 +74,7 @@ public class TreeBuilder implements Cancellable {
 			throw new IllegalArgumentException("Cannot build less than 1 level.");
 		if (treeLevelBuilder != null)
 			throw new IllegalStateException("Tree building already in progress.");
+		//this.cancellationPending = false; // apparently, someone wants to run after cancelling. Let's make that possible for him
 
 		treeLevelBuilder = new TreeLevelBuilder(tree, leaves, depth);
 		treeLevelBuilder.run();
@@ -83,7 +87,6 @@ public class TreeBuilder implements Cancellable {
 		}
 
 		treeLevelBuilder = null; // let GC do it's work
-		this.cancellationPending = false;
 
 		return finished;
 

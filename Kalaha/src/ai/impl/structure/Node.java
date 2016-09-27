@@ -102,4 +102,10 @@ public class Node {
 	}
 
 
+	@Override
+	public String toString() {
+		return "UtilityValue: " + utilityValue + ", Children: " + children.size() + ", GameMove: " + gameMove.toString();
+	}
+
+
 }

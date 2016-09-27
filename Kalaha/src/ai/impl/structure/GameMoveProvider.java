@@ -34,7 +34,7 @@ public class GameMoveProvider implements Iterable<GameMove> {
 
 	@Override
 	public Iterator<GameMove> iterator() {
-		return new GameAdapterIterator(this);
+		return new Itr(this);
 	}
 
 
@@ -44,10 +44,10 @@ public class GameMoveProvider implements Iterable<GameMove> {
 
 
 
-	protected static class GameAdapterIterator implements Iterator<GameMove> {
+	protected static class Itr implements Iterator<GameMove> {
 
 
-		private static final int AMBO_COUNT = 6;
+		private static final int AMBO_COUNT = 3; // TODO: debug
 		private static final int MIN_AMBO_INDEX = 1;
 		private static final int MAX_AMBO_INDEX = MIN_AMBO_INDEX + AMBO_COUNT - 1;
 
@@ -63,7 +63,7 @@ public class GameMoveProvider implements Iterable<GameMove> {
 
 
 
-		public GameAdapterIterator(GameMoveProvider gameMoveProvider) {
+		public Itr(GameMoveProvider gameMoveProvider) {
 			this.gameMove = gameMoveProvider.getGameMove();
 			this.amboIndex = MIN_AMBO_INDEX - 1;
 			calculateNextAmboIndex();
@@ -74,13 +74,17 @@ public class GameMoveProvider implements Iterable<GameMove> {
 
 		private void calculateNextAmboIndex() {
 			GameState gameState = gameMove.getGameState();
-			while (amboIndex++ <= MAX_AMBO_INDEX) {
-				if (gameState.moveIsPossible(amboIndex)) ;
-				break;
+			while (++amboIndex <= MAX_AMBO_INDEX) {
+				if (gameState.moveIsPossible(amboIndex))
+					break;
 			}
 		}
 
 
+		@Override
+		public void remove() {
+			throw new UnsupportedOperationException("Remove operation is not supported.");
+		}
 
 
 		@Override
@@ -93,7 +97,7 @@ public class GameMoveProvider implements Iterable<GameMove> {
 		public GameMove next() {
 			int index = amboIndex;
 			calculateNextAmboIndex();
-			return gameMove.makeMove(amboIndex);
+			return gameMove.makeMove(index);
 		}
 
 

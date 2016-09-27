@@ -85,12 +85,11 @@ public class AIClientManager implements Cancellable {
 
 
 	private void start() {
-		if (cancellationPending)
-			throw new IllegalStateException("Cancellation pending.");
 		if (running)
 			throw new IllegalStateException("Already running.");
 
 		cancellationTimer.start();
+		this.cancellationPending = false;
 		running = true;
 	}
 
@@ -118,7 +117,7 @@ public class AIClientManager implements Cancellable {
 		start();
 		for (int depth : depthLevelSupplier) {
 			treeBuilder.build(depth);
-			if (treeBuilder.isCancellationPending()) {
+			if (this.cancellationPending || treeBuilder.isCancellationPending()) {
 				end();
 				return false;
 			} else {

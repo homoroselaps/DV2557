@@ -17,6 +17,10 @@ public class StartArrayDepthLevelSupplier implements DepthLevelSupplier {
 
 	private final int[] startArray;
 	private final int baseDepth;
+	/**
+	 * After the limit is reached, the supplier will not provide any more depth levels.
+	 */
+	private final int depthLimit;
 
 
 
@@ -31,11 +35,34 @@ public class StartArrayDepthLevelSupplier implements DepthLevelSupplier {
 	}
 
 
+	public int getDepthLimit() {
+		return this.depthLimit;
+	}
 
 
-	public StartArrayDepthLevelSupplier(int baseDepth, int... startArray) {
-		this.startArray = startArray;
+	public boolean hasMaxDepth() {
+		return this.depthLimit != Integer.MAX_VALUE;
+	}
+
+
+
+
+	public StartArrayDepthLevelSupplier(int[] startArray, int baseDepth, int depthLimit) {
+		this.depthLimit = depthLimit;
 		this.baseDepth = baseDepth;
+		this.startArray = startArray;
+	}
+
+
+
+
+	public static StartArrayDepthLevelSupplier createNoLimit(int baseDepth, int... startArray) {
+		return new StartArrayDepthLevelSupplier(startArray, baseDepth, Integer.MAX_VALUE);
+	}
+
+
+	public static StartArrayDepthLevelSupplier create(int depthLimit, int baseDepth, int... startArray) {
+		return new StartArrayDepthLevelSupplier(startArray, baseDepth, depthLimit);
 	}
 
 
@@ -57,6 +84,31 @@ public class StartArrayDepthLevelSupplier implements DepthLevelSupplier {
 
 
 		private int index;
+		private int nextDepth;
+		private int depthReached;
+
+
+		public Itr() {
+			moveNextLevel();
+		}
+
+
+		private void moveNextLevel() {
+			StartArrayDepthLevelSupplier base = StartArrayDepthLevelSupplier.this;
+
+			if (this.index >= base.startArray.length) {
+				nextDepth = base.baseDepth;
+			} else {
+				nextDepth = base.startArray[index];
+				index++;
+			}
+
+
+			if (depthReached >= base.depthLimit) {
+				nextDepth = 0;
+			}
+			depthReached += nextDepth;
+		}
 
 
 		@Override
@@ -67,22 +119,14 @@ public class StartArrayDepthLevelSupplier implements DepthLevelSupplier {
 
 		@Override
 		public boolean hasNext() {
-			return true; // yes, there are infinite elements here
+			return this.nextDepth > 0;
 		}
 
 
 		@Override
 		public Integer next() {
-			StartArrayDepthLevelSupplier _super = StartArrayDepthLevelSupplier.this;
-
-			int res;
-			if (index >= 0 && index < _super.startArray.length)
-				res = _super.startArray[index];
-			else
-				res = _super.baseDepth;
-
-			index++;
-
+			int res = this.nextDepth;
+			moveNextLevel();
 			return res;
 		}
 

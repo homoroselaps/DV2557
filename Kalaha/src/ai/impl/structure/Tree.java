@@ -53,10 +53,10 @@ public class Tree {
 		if (root.getNextPlayer()) {
 			// this is maximizer
 			this.maxPlayer = player;
-			this.minPlayer = (player + 1) % 2;
+			this.minPlayer = (player % 2) + 1;
 		} else {
 			// this is maximizer
-			this.maxPlayer = (player + 1) % 2;
+			this.maxPlayer = (player % 2) + 1;
 			this.minPlayer = player;
 		}
 
@@ -68,7 +68,7 @@ public class Tree {
 
 
 	public static Tree create(GameState gameState) {
-		GameMove gameMove = GameMove.create(gameState, true);
+		GameMove gameMove = GameMove.create(gameState, false);
 		Node node = new Node(null, gameMove);
 		return new Tree(node);
 	}
@@ -128,6 +128,12 @@ public class Tree {
 
 	public GameMove getBestMove() {
 		return getBestMoveNode().getGameMove();
+	}
+
+
+	@Override
+	public String toString() {
+		return "MaxPlayer: " + maxPlayer + ", MinPlayer: " + minPlayer + ", Root: " + root.toString();
 	}
 
 

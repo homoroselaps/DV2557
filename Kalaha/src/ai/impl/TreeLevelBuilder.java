@@ -7,7 +7,10 @@ import ai.impl.structure.Node;
 import ai.impl.structure.Tree;
 import ai.impl.util.Cancellable;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 
 
@@ -29,6 +32,9 @@ public class TreeLevelBuilder implements Runnable, Cancellable {
 	private volatile boolean cancellationPending;
 	private boolean finished;
 	private boolean running;
+	// TODO: debug
+	private int stepCount;
+	private State currentState;
 
 
 
@@ -103,12 +109,17 @@ public class TreeLevelBuilder implements Runnable, Cancellable {
 			throw new IllegalStateException("Already running.");
 
 		running = true;
+
+		currentState = null;
+		stepCount = 0;
 	}
 
 
 	private void end(boolean finished) {
 		this.running = false;
 		this.finished = finished;
+
+		currentState = null;
 	}
 
 
@@ -126,6 +137,7 @@ public class TreeLevelBuilder implements Runnable, Cancellable {
 	private void buildTree() {
 		for (Node node : leaves) {
 			State state = State.createRoot(node, depth);
+			step(state);
 		}
 	}
 
@@ -137,6 +149,8 @@ public class TreeLevelBuilder implements Runnable, Cancellable {
 	 */
 	private void step(State state) {
 		GameMoveProvider gameMoveProvider = state.getNode().getGameMove().getGameMoveProvider();
+		stepCount++;
+		currentState = state;
 
 		if (cancellationPending)
 			return; // exit
@@ -154,6 +168,7 @@ public class TreeLevelBuilder implements Runnable, Cancellable {
 				// create children
 				State child = state.createChild(gameMove);
 				step(child);
+				currentState = state;
 
 				// this node may have requested pruning
 				if (state.shouldPrune()) {
@@ -224,6 +239,16 @@ public class TreeLevelBuilder implements Runnable, Cancellable {
 			UtilityValueManager.updateNodeAncestorUtilityValues(node);
 		}
 
+	}
+
+
+	@Override
+	public String toString() {
+		if (currentState == null) {
+			return "Running: " + running + ", StepCount: " + stepCount + ", CurrentState: null";
+		} else {
+			return "Running: + " + running + ", StepCount: " + stepCount + ", CurrentState: " + currentState.toString();
+		}
 	}
 
 
@@ -323,6 +348,12 @@ public class TreeLevelBuilder implements Runnable, Cancellable {
 
 		public void updateParentUtilityValue() {
 			this.parent.node.setUtilityValue(this.node.getUtilityValue());
+		}
+
+
+		@Override
+		public String toString() {
+			return "LevelsToAdd: " + levelsToAdd + ", Prune: " + prune + ", Node: " + node.toString();
 		}
 
 
