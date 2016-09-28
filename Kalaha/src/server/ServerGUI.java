@@ -201,14 +201,14 @@ public class ServerGUI implements ActionListener
         {
             try
             {
-                for (int i = 0; i < 2; i++) {
+                for (int i = 0; i < 10; i++) {
                     KalahaServer s = KalahaServer.getInstance();
                     s.stop();
                     int p = Integer.parseInt(portField.getText());
                     KalahaMain.port = p;
                     s.start();
                     for (int k = 0; k < 2; k++) {
-                        new Thread(new RandomClient()).start();
+                        new Thread(new AIClient()).start();
                     }
                     Thread.sleep(10000);
                 }

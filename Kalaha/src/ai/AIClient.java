@@ -1,15 +1,18 @@
 package ai;
 
-import ai.Global;
 import java.io.*;
 import java.net.*;
 import javax.swing.*;
 import java.awt.*;
 import java.nio.file.Files;
+import ai.impl.AIClientManager;
+import ai.impl.DepthLevelSupplier;
+import ai.impl.GameUtility;
+import ai.impl.LookUpManager;
+import ai.impl.StartArrayDepthLevelSupplier;
+import ai.impl.structure.Tree;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import kalaha.*;
 
 /**
@@ -30,6 +33,9 @@ public class AIClient implements Runnable
     private boolean running;
     private boolean connected;
     private int firstMove;
+    private LookUpManager lookupManager = new LookUpManager();
+    private int moveCount = 0;
+    private final boolean TRAIN_AI = true;
     	
     /**
      * Creates a new client.
@@ -51,6 +57,8 @@ public class AIClient implements Runnable
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             addText("Done");
             connected = true;
+            //Load the LookupTable
+            lookupManager.loadFile("games.txt");
         }
         catch (Exception ex)
         {
@@ -139,12 +147,12 @@ public class AIClient implements Runnable
                     if (w == player)
                     {
                         addText("I won!");
-                        saveGame(firstMove, 1);
+                        if (TRAIN_AI) saveGame(firstMove, 1);
                     }
                     else
                     {
                         addText("I lost...");
-                        saveGame(firstMove, 0);
+                        if (TRAIN_AI) saveGame(firstMove, 0);
                     }
                     running = false;
                 }
@@ -220,8 +228,32 @@ public class AIClient implements Runnable
      */
     public int getMove(GameState currentBoard)
     {
-        int myMove = getRandom();
-        return myMove;
+        moveCount++;
+	    try {
+            if (moveCount == 1) {
+                if (TRAIN_AI) firstMove  = (int) (Math.random() * 6 + 1);
+                else firstMove = lookupManager.getBestMove();
+                return firstMove;
+            }
+		    Tree tree = Tree.create(currentBoard);
+		    DepthLevelSupplier depthLevelSupplier = StartArrayDepthLevelSupplier.createNoLimit(2, 5, 3);
+		    AIClientManager aiClientManager = AIClientManager.fromTree(tree);
+
+		    aiClientManager.run(depthLevelSupplier);
+            int selectedAmbo = tree.getBestMove().getSelectedAmbo();
+
+            this.addText("Depth reached: " + aiClientManager.getDepthReached());
+            this.addText("Selected ambo: " + selectedAmbo);
+
+		    return selectedAmbo;
+
+	    } catch (Exception ex) {
+
+		    this.addText("AI internal error: " + ex.getMessage());
+		    return GameUtility.getFirstAvailableMove(currentBoard);
+
+	    }
+
     }
     
     /**
@@ -240,7 +272,7 @@ public class AIClient implements Runnable
         try {
             Files.write(Paths.get("games.txt"), line.getBytes(), StandardOpenOption.APPEND);
         } catch (IOException ex) {
-            Logger.getLogger(AIClient.class.getName()).log(Level.SEVERE, null, ex);
+            // foobaa
         }
     }
 }
