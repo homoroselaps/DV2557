@@ -11,5 +11,7 @@ public interface TreeBuilder {
 
     Tree buildFurther(int levels);
 
+    void assignUtilityValues();
+
     Tree getCurrentTree();
 }

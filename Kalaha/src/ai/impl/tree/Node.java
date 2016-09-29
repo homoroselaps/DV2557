@@ -20,6 +20,7 @@ public abstract class Node {
     private final Node parent;
     private final ArrayList<Node> children = new ArrayList<>(CHILDREN_LIST_INITIALIZATION);
     private GameState gameState;
+    private int lastMove;
     private int utilityValue;
 
 
@@ -60,11 +61,13 @@ public abstract class Node {
 
     public Node(Node parent) {
         this.parent = parent;
+        this.lastMove = -1;
     }
 
-    public Node(Node parent, GameState game) {
+    public Node(Node parent, GameState game, int lastMove) {
         this.parent = parent;
         this.gameState = game;
+        this.lastMove = lastMove;
     }
 
     public abstract void expandPossibleMoves();
