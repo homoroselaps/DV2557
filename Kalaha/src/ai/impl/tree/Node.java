@@ -2,7 +2,6 @@ package ai.impl.tree;
 
 
 import ai.impl.UtilityManager;
-import com.sun.istack.internal.Nullable;
 import kalaha.GameState;
 
 import java.util.ArrayList;
@@ -63,5 +62,10 @@ public abstract class Node {
         this.parent = parent;
     }
 
+    public Node(Node parent, GameState game) {
+        this.parent = parent;
+        this.gameState = game;
+    }
 
+    public abstract void expandPossibleMoves();
 }
