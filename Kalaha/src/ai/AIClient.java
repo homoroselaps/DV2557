@@ -218,12 +218,10 @@ public class AIClient implements Runnable
     {
 
 	    try {
-            AIClientManager clientManager = AIClientManager.create(currentBoard, 5000L);
-            // DepthLevelSupplier depthLevelSupplier = StartArrayDepthLevelSupplier.create(5, 2, 3);
-            DepthLevelSupplier depthLevelSupplier = StartArrayDepthLevelSupplier.createNoLimit(2, 6, 4);
+            AIClientManager clientManager = AIClientManager.create(currentBoard, 4990L);
+            DepthLevelSupplier depthLevelSupplier = StartArrayDepthLevelSupplier.createNoLimit(2, 3, 7, 4);
 
             clientManager.run(depthLevelSupplier);
-
             addText("Depth reached: " + clientManager.getDepthReached());
 
             return clientManager.getSelectedMove();

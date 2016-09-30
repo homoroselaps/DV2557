@@ -32,6 +32,7 @@ public final class PruningManager {
 			return new PruningCallback() {
 				@Override
 				public boolean shouldPrune(Node grandChild) {
+//					return false;
 					if (node.getNextPlayer()) { // maximizer
 						if (grandChild.getUtilityValue() < node.getUtilityValue())
 							return true;
@@ -51,23 +52,30 @@ public final class PruningManager {
 	public static void onNodeChildProcessed(Node node, Node child) {
 		if (!node.hasUtilityValue()) { // first node
 			node.setUtilityValue(child.getUtilityValue());
-			node.amboToSelect = child.getGameMove().getSelectedAmbo();
+			node.setAmboToSelect(child.getGameMove().getSelectedAmbo());
 			return;
 		}
 		int nodeUtilityValue = node.getUtilityValue();
 		int childUtilityValue = child.getUtilityValue();
 
-		if (node.getNextPlayer()) {
-			if (childUtilityValue > nodeUtilityValue) {
-				node.setUtilityValue(childUtilityValue);
-				node.amboToSelect = child.getGameMove().getSelectedAmbo();
-			}
-		} else {
-			if (childUtilityValue < nodeUtilityValue) {
-				node.setUtilityValue(childUtilityValue);
-				node.amboToSelect = child.getGameMove().getSelectedAmbo();
-			}
+//		if (node.getNextPlayer()) {
+//			if (childUtilityValue > nodeUtilityValue) {
+//				node.setUtilityValue(childUtilityValue);
+//				node.setAmboToSelect(child.getGameMove().getSelectedAmbo());
+//			}
+//		} else {
+//			if (childUtilityValue < nodeUtilityValue) {
+//				node.setUtilityValue(childUtilityValue);
+//				node.setAmboToSelect(child.getGameMove().getSelectedAmbo());
+//			}
+//		}
+
+		if ((node.getNextPlayer() && childUtilityValue > nodeUtilityValue)
+				|| (!node.getNextPlayer() && childUtilityValue < nodeUtilityValue)) {
+			node.setUtilityValue(childUtilityValue);
+			node.setAmboToSelect(child.getGameMove().getSelectedAmbo());
 		}
+
 	}
 
 

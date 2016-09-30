@@ -6,6 +6,7 @@ import ai.impl.DepthLevelSupplier;
 import ai.impl.StartArrayDepthLevelSupplier;
 import kalaha.GameState;
 
+import javax.swing.text.AsyncBoxView;
 import java.util.Random;
 
 
@@ -33,7 +34,7 @@ public class Debugging {
 
 	public static void main(String[] args) {
 		//while (true) {
-		System.out.println("Starting a new game...");
+		System.out.println("Starting a new game...\n");
 		Debugging d = new Debugging();
 		d.run();
 		//}
@@ -103,14 +104,16 @@ public class Debugging {
 
 
 	private int getAIMove(GameState currentBoard) {
-		AIClientManager clientManager = AIClientManager.create(currentBoard, 5000L);
-//		DepthLevelSupplier depthLevelSupplier = StartArrayDepthLevelSupplier.create(5, 2, 3);
-		DepthLevelSupplier depthLevelSupplier = StartArrayDepthLevelSupplier.createNoLimit(2, 6, 4);
+		AIClientManager clientManager = AIClientManager.create(currentBoard, 4990L);
+//		DepthLevelSupplier depthLevelSupplier = StartArrayDepthLevelSupplier.create(4, 4);
+		DepthLevelSupplier depthLevelSupplier = StartArrayDepthLevelSupplier.createNoLimit(2, 10, 4);
 
 		clientManager.run(depthLevelSupplier);
 
 		addText("Depth reached: " + clientManager.getDepthReached());
 		addText("Utility Value: " + clientManager.getRoot().getUtilityValue());
+		addText("Selected ambo: " + clientManager.getRoot().getAmboToSelect());
+//		addText("Children reached: " + clientManager.getRoot().children.size());
 
 		return clientManager.getSelectedMove();
 	}

@@ -99,7 +99,7 @@ public class AIClientManager implements Cancellable {
 	public static AIClientManager create(GameState gameState, long timeout) {
 		GameMove gameMove = GameMove.create(gameState, true);
 		Node node = new Node(gameMove, 0);
-		return new AIClientManager(node, 2, timeout);
+		return new AIClientManager(node, gameState.getNextPlayer(), timeout);
 	}
 
 

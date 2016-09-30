@@ -81,34 +81,41 @@ public class NodeBuilder implements Cancellable {
 
 		stepCount = 0;
 		Node root = clientManager.getRoot();
+		root.clearUtilityValue();
 		root.setLevelsToAdd(depth);
 
-		selectedMove = step(root, null);
+		step(root, null);
 
-		if (!cancellationPending)
+		if (!cancellationPending) {
 			depthReached = depth;
+			selectedMove = root.getAmboToSelect();
+		}
 
 		running = false;
 		return !cancellationPending;
 	}
 
 
-	private int step(Node node, PruningManager.PruningCallback pruningCallback) {
+	private void step(Node node, PruningManager.PruningCallback pruningCallback) {
 		if (cancellationPending)
-			return -1;
+			return;
 
 		int sc = stepCount;
 		stepCount++;
 
 		if (node.isLeaf()) {
 			node.setUtilityValue(UtilityValueManager.getUtilityValueFromState(clientManager, node.getGameMove()));
-			return node.getGameMove().getSelectedAmbo();
+			node.setAmboToSelect(-1);
+			return;
 		}
 
 		// the node is not a leaf
 		node.clearUtilityValue();
 
 		Iterator<GameMove> gameMoveIterator = node.getGameMove().getGameMoveProvider().iterator();
+
+		if(!gameMoveIterator.hasNext())
+			node.setUtilityValue(UtilityValueManager.getUtilityValueFromState(clientManager, node.getGameMove()));
 
 		int i = -1;
 		while (gameMoveIterator.hasNext()) {
@@ -120,12 +127,12 @@ public class NodeBuilder implements Cancellable {
 			step(child, pc);
 			PruningManager.onNodeChildProcessed(node, child);
 
-			if (pruningCallback != null && pruningCallback.shouldPrune(child))
+			if (cancellationPending || pruningCallback != null && pruningCallback.shouldPrune(child))
 				break; // prune
 
 		}
 
-		return node.amboToSelect;
+		return;
 
 	}
 

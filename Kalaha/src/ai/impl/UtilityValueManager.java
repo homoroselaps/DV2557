@@ -46,26 +46,9 @@ public final class UtilityValueManager {
 		int valuePlayer = gameState.getScore(clientManager.getMaxPlayer());
 		int valueOpponent = gameState.getScore(clientManager.getMinPlayer());
 
-		return valuePlayer; // - valueOpponent;
+//		return valuePlayer;
+		return valuePlayer - valueOpponent;
 	}
-
-
-//	public static int getUtilityValueFromChildren(Node node) {
-//		List<Node> children = node.getChildren();
-//
-//		if (children.size() == 0)
-//			return NO_VALUE;
-//
-//		int value = children.get(0).getUtilityValue();
-//		MinMaxComparator comparator = getComparator(node.getNextPlayer());
-//
-//		for (int i = 1; i < children.size(); i++) {
-//			value = comparator.get(value, children.get(i).getUtilityValue());
-//		}
-//
-//		return value;
-//	}
-
 
 
 

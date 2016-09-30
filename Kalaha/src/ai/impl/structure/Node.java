@@ -4,6 +4,7 @@ package ai.impl.structure;
 import ai.impl.UtilityValueManager;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import static ai.impl.UtilityValueManager.NO_VALUE;
 
@@ -22,7 +23,8 @@ public class Node {
 	private final GameMove gameMove;
 	private int utilityValue = NO_VALUE;
 	private int levelsToAdd;
-	public int amboToSelect;
+	private int amboToSelect = -1;
+//	public List<Node> children = new ArrayList<>(6);
 
 
 
@@ -87,6 +89,16 @@ public class Node {
 	}
 
 
+	public int getAmboToSelect() {
+		return amboToSelect;
+	}
+
+
+	public void setAmboToSelect(int amboToSelect) {
+		this.amboToSelect = amboToSelect;
+	}
+
+
 
 
 	public Node(GameMove gameMove, int levelsToAdd) {
@@ -99,6 +111,7 @@ public class Node {
 
 	public Node createChild(GameMove gameMove) {
 		Node node = new Node(gameMove, levelsToAdd - 1);
+//		this.children.add(node);
 		return node;
 	}
 
