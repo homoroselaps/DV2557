@@ -9,9 +9,6 @@ import kalaha.GameState;
  */
 public interface TreeBuilder {
 
-    Tree buildFurther(int levels);
+    void buildUntil(int level);
 
-    void assignUtilityValues();
-
-    Tree getCurrentTree();
 }

@@ -9,21 +9,20 @@ import kalaha.GameState;
  */
 public class Tree {
 
-
-    private Node root = new MaxNode(null);
+    private Node root;
 
     /**
      * Creates Tree with one {@link MaxNode} for the given game state
      * @param startingGame
      */
     public Tree(GameState startingGame) {
-        this.root = new MaxNode(null, startingGame);
+        int player = startingGame.getNextPlayer();
+        this.root = new MaxNode(player, startingGame);
     }
 
 
     public Node getRoot() {
         return root;
     }
-
 
 }
