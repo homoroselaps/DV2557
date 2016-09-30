@@ -2,11 +2,7 @@ package ai.impl;
 
 
 import ai.impl.structure.GameMove;
-import ai.impl.structure.Node;
-import ai.impl.structure.Tree;
 import kalaha.GameState;
-
-import java.util.List;
 
 
 
@@ -44,31 +40,31 @@ public final class UtilityValueManager {
 
 
 
-	public static int getUtilityValueFromState(Tree tree, GameMove gameMove) {
+	public static int getUtilityValueFromState(AIClientManager clientManager, GameMove gameMove) {
 		GameState gameState = gameMove.getGameState();
 
-		int valuePlayer = gameState.getScore(tree.getMaxPlayer());
-		int valueOpponent = gameState.getScore(tree.getMinPlayer());
+		int valuePlayer = gameState.getScore(clientManager.getMaxPlayer());
+		int valueOpponent = gameState.getScore(clientManager.getMinPlayer());
 
 		return valuePlayer; // - valueOpponent;
 	}
 
 
-	public static int getUtilityValueFromChildren(Node node) {
-		List<Node> children = node.getChildren();
-
-		if (children.size() == 0)
-			return NO_VALUE;
-
-		int value = children.get(0).getUtilityValue();
-		MinMaxComparator comparator = getComparator(node.getNextPlayer());
-
-		for (int i = 1; i < children.size(); i++) {
-			value = comparator.get(value, children.get(i).getUtilityValue());
-		}
-
-		return value;
-	}
+//	public static int getUtilityValueFromChildren(Node node) {
+//		List<Node> children = node.getChildren();
+//
+//		if (children.size() == 0)
+//			return NO_VALUE;
+//
+//		int value = children.get(0).getUtilityValue();
+//		MinMaxComparator comparator = getComparator(node.getNextPlayer());
+//
+//		for (int i = 1; i < children.size(); i++) {
+//			value = comparator.get(value, children.get(i).getUtilityValue());
+//		}
+//
+//		return value;
+//	}
 
 
 

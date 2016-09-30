@@ -9,7 +9,6 @@ import ai.impl.AIClientManager;
 import ai.impl.DepthLevelSupplier;
 import ai.impl.GameUtility;
 import ai.impl.StartArrayDepthLevelSupplier;
-import ai.impl.structure.Tree;
 import kalaha.*;
 
 /**
@@ -219,18 +218,15 @@ public class AIClient implements Runnable
     {
 
 	    try {
+            AIClientManager clientManager = AIClientManager.create(currentBoard, 5000L);
+            // DepthLevelSupplier depthLevelSupplier = StartArrayDepthLevelSupplier.create(5, 2, 3);
+            DepthLevelSupplier depthLevelSupplier = StartArrayDepthLevelSupplier.createNoLimit(2, 6, 4);
 
-		    Tree tree = Tree.create(currentBoard);
-		    DepthLevelSupplier depthLevelSupplier = StartArrayDepthLevelSupplier.createNoLimit(2, 5, 3);
-		    AIClientManager aiClientManager = AIClientManager.fromTree(tree);
+            clientManager.run(depthLevelSupplier);
 
-		    aiClientManager.run(depthLevelSupplier);
-            int selectedAmbo = tree.getBestMove().getSelectedAmbo();
+            addText("Depth reached: " + clientManager.getDepthReached());
 
-            this.addText("Depth reached: " + aiClientManager.getDepthReached());
-            this.addText("Selected ambo: " + selectedAmbo);
-
-		    return selectedAmbo;
+            return clientManager.getSelectedMove();
 
 	    } catch (Exception ex) {
 

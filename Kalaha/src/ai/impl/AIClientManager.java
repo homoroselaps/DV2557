@@ -1,9 +1,11 @@
 package ai.impl;
 
 
-import ai.impl.structure.Tree;
+import ai.impl.structure.GameMove;
+import ai.impl.structure.Node;
 import ai.impl.util.Cancellable;
 import ai.impl.util.CancellationTimer;
+import kalaha.GameState;
 
 
 
@@ -23,16 +25,40 @@ public class AIClientManager implements Cancellable {
 	public static final long DEFAULT_TIMEOUT = 4900;
 
 
+	private final Node root;
+	private final int maxPlayer;
+	private final int minPlayer;
 	private final CancellationTimer cancellationTimer;
 	private final NodeBuilder nodeBuilder;
+	private int selectedMove;
 	private boolean running;
-	private boolean cancellationPending;
+	private volatile boolean cancellationPending;
 
 
+
+
+	public Node getRoot() {
+		return root;
+	}
+
+
+	public int getMaxPlayer() {
+		return maxPlayer;
+	}
+
+
+	public int getMinPlayer() {
+		return minPlayer;
+	}
 
 
 	public NodeBuilder getNodeBuilder() {
 		return nodeBuilder;
+	}
+
+
+	public int getSelectedMove() {
+		return selectedMove;
 	}
 
 
@@ -59,26 +85,26 @@ public class AIClientManager implements Cancellable {
 
 
 
-	public AIClientManager(NodeBuilder nodeBuilder, long timeout) {
-		this.nodeBuilder = nodeBuilder;
+	private AIClientManager(Node root, int maxPlayer, long timeout) {
+		this.root = root;
+		this.maxPlayer = maxPlayer;
+		this.minPlayer = (maxPlayer % 2) + 1;
+		this.nodeBuilder = new NodeBuilder(this);
 		this.cancellationTimer = new CancellationTimer(nodeBuilder, timeout);
 	}
 
 
-	public AIClientManager(NodeBuilder nodeBuilder) {
-		this(nodeBuilder, DEFAULT_TIMEOUT);
+
+
+	public static AIClientManager create(GameState gameState, long timeout) {
+		GameMove gameMove = GameMove.create(gameState, true);
+		Node node = new Node(gameMove, 0);
+		return new AIClientManager(node, 2, timeout);
 	}
 
 
-
-
-	public static AIClientManager fromTree(Tree tree) {
-		return fromTree(tree, DEFAULT_TIMEOUT);
-	}
-
-
-	public static AIClientManager fromTree(Tree tree, long timeout) {
-		return new AIClientManager(new NodeBuilder(tree), timeout);
+	public static AIClientManager create(GameState gameState) {
+		return create(gameState, DEFAULT_TIMEOUT);
 	}
 
 
@@ -117,9 +143,11 @@ public class AIClientManager implements Cancellable {
 		for (int depth : depthLevelSupplier) {
 			boolean res = nodeBuilder.run(nodeBuilder.getDepthReached() + depth);
 
-			if (this.cancellationPending || !res) {
+			if (!res) {
 				end();
 				return false;
+			} else {
+				this.selectedMove = nodeBuilder.getSelectedMove();
 			}
 		}
 

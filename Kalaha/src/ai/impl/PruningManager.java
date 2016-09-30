@@ -2,7 +2,8 @@ package ai.impl;
 
 
 import ai.impl.structure.Node;
-import ai.impl.structure.Tree;
+
+import javax.swing.text.AsyncBoxView;
 
 
 
@@ -11,36 +12,16 @@ import ai.impl.structure.Tree;
  * Manages pruning.
  * Created by Nejc on 23. 09. 2016.
  */
-public class PruningManager {
+public final class PruningManager {
 
 
-	private final Node node;
-
-
-	public PruningManager(Node node) {
-		this.node = node;
-	}
-
-
-	private static int getPreferredUtilityValue(int value1, int value2, boolean player) {
-		if (player)
-			return Math.max(value1, value2);
-		else
-			return Math.min(value1, value2);
+	private PruningManager() {
 	}
 
 
 
 
-
-
-	// node stepped into
-	public void onNodeProcessed() {
-
-	}
-
-
-	public PruningCallback onNodeChildCreated(Node child, int i) {
+	public static PruningCallback onNodeChildCreated(final Node node, Node child) {
 		if (node.getNextPlayer() == child.getNextPlayer()) {
 			child.setUtilityValue(node.getUtilityValue()); // the child needs to exceed the threshold
 			return null; // we shouldn't prune here
@@ -67,31 +48,26 @@ public class PruningManager {
 	}
 
 
-	public void onNodeChildProcessed(Node child, int i) {
+	public static void onNodeChildProcessed(Node node, Node child) {
 		if (!node.hasUtilityValue()) { // first node
 			node.setUtilityValue(child.getUtilityValue());
+			node.amboToSelect = child.getGameMove().getSelectedAmbo();
 			return;
 		}
 		int nodeUtilityValue = node.getUtilityValue();
 		int childUtilityValue = child.getUtilityValue();
 
 		if (node.getNextPlayer()) {
-			if (childUtilityValue > nodeUtilityValue)
+			if (childUtilityValue > nodeUtilityValue) {
 				node.setUtilityValue(childUtilityValue);
+				node.amboToSelect = child.getGameMove().getSelectedAmbo();
+			}
 		} else {
-			if (childUtilityValue < nodeUtilityValue)
+			if (childUtilityValue < nodeUtilityValue) {
 				node.setUtilityValue(childUtilityValue);
+				node.amboToSelect = child.getGameMove().getSelectedAmbo();
+			}
 		}
-
-
-	}
-
-
-	// step function exit
-	public void onNodeProcessedEnd(Tree tree) {
-		// if there were no children, get the utility value from game state
-		if (!node.hasUtilityValue())
-			node.setUtilityValue(UtilityValueManager.getUtilityValueFromState(tree, node.getGameMove()));
 	}
 
 

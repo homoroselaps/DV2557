@@ -11,7 +11,7 @@ import static ai.impl.UtilityValueManager.NO_VALUE;
 
 
 /**
- * A node of the {@link Tree}
+ *
  * Created by Nejc on 23. 09. 2016.
  */
 public class Node {
@@ -19,34 +19,12 @@ public class Node {
 
 
 
-	private static final int CHILDREN_LIST_INITIALIZATION = 6;
-
-
-
-
-	private final Node parent;
-	private final ArrayList<Node> children = new ArrayList<>(CHILDREN_LIST_INITIALIZATION);
 	private final GameMove gameMove;
 	private int utilityValue = NO_VALUE;
 	private int levelsToAdd;
-	private int pruningValue;
+	public int amboToSelect;
 
 
-
-
-	public Node getParent() {
-		return parent;
-	}
-
-
-	public boolean hasParent() {
-		return parent != null;
-	}
-
-
-	public ArrayList<Node> getChildren() {
-		return children;
-	}
 
 
 	public int getUtilityValue() {
@@ -99,16 +77,6 @@ public class Node {
 	}
 
 
-	public int getPruningValue() {
-		return pruningValue;
-	}
-
-
-	public void setPruningValue(int value) {
-		this.pruningValue = value;
-	}
-
-
 	public boolean isLeaf() {
 		return levelsToAdd <= 0 || gameMove.getGameState().gameEnded();
 	}
@@ -121,8 +89,7 @@ public class Node {
 
 
 
-	public Node(Node parent, GameMove gameMove, int levelsToAdd) {
-		this.parent = parent;
+	public Node(GameMove gameMove, int levelsToAdd) {
 		this.gameMove = gameMove;
 		this.levelsToAdd = levelsToAdd;
 	}
@@ -131,24 +98,16 @@ public class Node {
 
 
 	public Node createChild(GameMove gameMove) {
-		Node node = new Node(this, gameMove, levelsToAdd - 1);
-		this.children.add(node);
+		Node node = new Node(gameMove, levelsToAdd - 1);
 		return node;
 	}
 
 
-	public int countSubNodes(boolean includeSelf) {
-		int count = includeSelf ? 1 : 0;
-		for (Node child : children) {
-			count += child.countSubNodes(true);
-		}
-		return count;
-	}
 
 
 	@Override
 	public String toString() {
-		return "UtilityValue: " + utilityValue + ", Children: " + children.size() + ", GameMove: { " + gameMove.toString() + " }";
+		return "UtilityValue: " + utilityValue + /*", Children: " + children.size() +*/ ", GameMove: { " + gameMove.toString() + " }";
 	}
 
 

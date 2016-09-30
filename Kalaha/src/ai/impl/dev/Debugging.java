@@ -4,8 +4,9 @@ package ai.impl.dev;
 import ai.impl.AIClientManager;
 import ai.impl.DepthLevelSupplier;
 import ai.impl.StartArrayDepthLevelSupplier;
-import ai.impl.structure.Tree;
 import kalaha.GameState;
+
+import java.util.Random;
 
 
 
@@ -18,68 +19,13 @@ public class Debugging {
 
 
 	private GameState gameState;
+	private Random random = new Random();
+
+
 
 
 	public Debugging() {
 		gameState = new GameState();
-	}
-
-
-
-
-	private void run() {
-		boolean startWithAI = true;
-		int aiPlayer = -1;
-		while (!gameState.gameEnded()) {
-			if (startWithAI) {
-				aiPlayer = gameState.getNextPlayer();
-				System.out.print("AI's move ... ");
-				int move = getAIMove(gameState);
-//				System.out.println(move);
-				gameState.makeMove(move);
-			} else {
-				int move = getPlayerMove(gameState);
-				System.out.println("Player's turn ... "); // + move);
-				gameState.makeMove(move);
-			}
-			startWithAI = !startWithAI;
-			this.addText("");
-		}
-		int winner = gameState.getWinner();
-		System.out.println(winner >= 1
-				? "Winner: " + (aiPlayer == gameState.getWinner() ? "AI" : "Player")
-				: "Draw"
-		);
-		System.out.println(aiPlayer);
-		System.out.println(gameState.getScore(aiPlayer));
-		System.out.println(gameState.getScore(aiPlayer % 2 + 1));
-	}
-
-
-	private void addText(String msg) {
-		System.out.println(msg);
-	}
-
-
-	private int getPlayerMove(GameState currentBoard) {
-		for (int i = 1; i <= 6; i++) {
-			if (currentBoard.moveIsPossible(i))
-				return i;
-		}
-		return -1;
-	}
-
-
-	private int getAIMove(GameState currentBoard) {
-		Tree tree = Tree.create(currentBoard);
-		DepthLevelSupplier depthLevelSupplier = StartArrayDepthLevelSupplier.create(6, 2);
-		AIClientManager aiClientManager = AIClientManager.fromTree(tree, 90000000L);
-
-		aiClientManager.run(depthLevelSupplier);
-
-		this.addText("Depth reached: " + aiClientManager.getDepthReached());
-		this.addText("Node count: " + tree.countNodes());
-		return tree.getBestMove().getSelectedAmbo();
 	}
 
 
@@ -91,6 +37,82 @@ public class Debugging {
 		Debugging d = new Debugging();
 		d.run();
 		//}
+	}
+
+
+	private static int getRandom() {
+		return 1 + (int) (Math.random() * 6);
+	}
+
+
+	private void addText(String msg) {
+		System.out.println(msg);
+	}
+
+
+	private int getOpponentMove(GameState currentBoard) {
+		int selectedAmbo = getRandom();
+		while (!currentBoard.moveIsPossible(selectedAmbo))
+			selectedAmbo = getRandom();
+		return selectedAmbo;
+	}
+
+
+
+
+	private void run() {
+		boolean startWithAI = true;
+		int ai = startWithAI ? 1 : 2;
+		int opponent = (ai % 2) + 1;
+
+		while (!gameState.gameEnded()) {
+			if (gameState.getNextPlayer() == ai) {
+
+				System.out.println("AI's move ... ");
+
+				TimeTracker.PUBLIC_INSTANCE.start();
+				int move = getAIMove(gameState);
+				TimeTracker.PUBLIC_INSTANCE.stopPrint();
+
+				gameState.makeMove(move);
+
+			} else {
+
+				int move = getOpponentMove(gameState);
+				System.out.println("Opponent's turn ... "); // + move);
+				gameState.makeMove(move);
+			}
+
+			this.addText("");
+		}
+
+		int winner = gameState.getWinner();
+		if (winner >= 1) {
+			System.out.println("Winner: " + (winner == ai ? "AI" : "Player"));
+			System.out.println("---------------------");
+			System.out.println("Score AI: " + gameState.getScore(ai));
+			System.out.println("Score Opp: " + gameState.getScore(opponent));
+			System.out.println("Score Diff: " + (gameState.getScore(winner) - gameState.getScore((winner % 2) + 1)));
+		} else {
+			System.out.println("Draw");
+		}
+
+	}
+
+
+
+
+	private int getAIMove(GameState currentBoard) {
+		AIClientManager clientManager = AIClientManager.create(currentBoard, 5000L);
+//		DepthLevelSupplier depthLevelSupplier = StartArrayDepthLevelSupplier.create(5, 2, 3);
+		DepthLevelSupplier depthLevelSupplier = StartArrayDepthLevelSupplier.createNoLimit(2, 6, 4);
+
+		clientManager.run(depthLevelSupplier);
+
+		addText("Depth reached: " + clientManager.getDepthReached());
+		addText("Utility Value: " + clientManager.getRoot().getUtilityValue());
+
+		return clientManager.getSelectedMove();
 	}
 
 
