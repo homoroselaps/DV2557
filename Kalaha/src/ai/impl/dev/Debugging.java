@@ -29,24 +29,30 @@ public class Debugging {
 
 	private void run() {
 		boolean startWithAI = true;
+		int aiPlayer = -1;
 		while (!gameState.gameEnded()) {
 			if (startWithAI) {
+				aiPlayer = gameState.getNextPlayer();
 				System.out.print("AI's move ... ");
 				int move = getAIMove(gameState);
-				System.out.println(move);
+//				System.out.println(move);
 				gameState.makeMove(move);
 			} else {
 				int move = getPlayerMove(gameState);
-				System.out.println("Player's turn ... " + move);
+				System.out.println("Player's turn ... "); // + move);
 				gameState.makeMove(move);
 			}
 			startWithAI = !startWithAI;
+			this.addText("");
 		}
 		int winner = gameState.getWinner();
 		System.out.println(winner >= 1
-				? "Winner: " + (startWithAI ? "AI" : "Player")
+				? "Winner: " + (aiPlayer == gameState.getWinner() ? "AI" : "Player")
 				: "Draw"
 		);
+		System.out.println(aiPlayer);
+		System.out.println(gameState.getScore(aiPlayer));
+		System.out.println(gameState.getScore(aiPlayer % 2 + 1));
 	}
 
 
@@ -66,16 +72,15 @@ public class Debugging {
 
 	private int getAIMove(GameState currentBoard) {
 		Tree tree = Tree.create(currentBoard);
-		DepthLevelSupplier depthLevelSupplier = StartArrayDepthLevelSupplier.create(3, 1, 2);
+		DepthLevelSupplier depthLevelSupplier = StartArrayDepthLevelSupplier.create(6, 2);
 		AIClientManager aiClientManager = AIClientManager.fromTree(tree, 90000000L);
 
 		aiClientManager.run(depthLevelSupplier);
 
 		this.addText("Depth reached: " + aiClientManager.getDepthReached());
+		this.addText("Node count: " + tree.countNodes());
 		return tree.getBestMove().getSelectedAmbo();
 	}
-
-
 
 
 

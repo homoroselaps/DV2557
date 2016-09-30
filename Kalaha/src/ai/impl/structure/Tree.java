@@ -17,8 +17,6 @@ import java.util.List;
 public class Tree {
 
 
-	private final PruningManager pruningManager;
-	private final UtilityValueManager utilityValueManager;
 	private final Node root;
 	private final int maxPlayer;
 	private final int minPlayer;
@@ -31,16 +29,6 @@ public class Tree {
 	}
 
 
-	public PruningManager getPruningManager() {
-		return pruningManager;
-	}
-
-
-	public UtilityValueManager getUtilityValueManager() {
-		return utilityValueManager;
-	}
-
-
 	public int getMaxPlayer() {
 		return maxPlayer;
 	}
@@ -49,6 +37,7 @@ public class Tree {
 	public int getMinPlayer() {
 		return minPlayer;
 	}
+
 
 
 
@@ -68,9 +57,6 @@ public class Tree {
 			this.maxPlayer = (player % 2) + 1;
 			this.minPlayer = player;
 		}
-
-		this.pruningManager = new PruningManager();
-		this.utilityValueManager = new UtilityValueManager(this);
 	}
 
 
@@ -78,7 +64,7 @@ public class Tree {
 
 	public static Tree create(GameState gameState) {
 		GameMove gameMove = GameMove.create(gameState, true);
-		Node node = new Node(null, gameMove);
+		Node node = new Node(null, gameMove, 0);
 		return new Tree(node);
 	}
 
@@ -113,7 +99,7 @@ public class Tree {
 //		return root
 //				.getChildren()
 //				.stream()
-//				.max((a, b) -> Integer.compare(b.getUtilityValue(), a.getUtilityValue()))
+//				.max((a, b) -> Integer.compare(b.getUtilityValueFromState(), a.getUtilityValueFromState()))
 //				.filter(node -> node.hasUtilityValue())
 //				.orElseThrow(() -> new IllegalStateException("No valid node."));
 
@@ -137,6 +123,11 @@ public class Tree {
 
 	public GameMove getBestMove() {
 		return getBestMoveNode().getGameMove();
+	}
+
+
+	public int countNodes() {
+		return root.countSubNodes(true);
 	}
 
 

@@ -28,6 +28,8 @@ public class Node {
 	private final ArrayList<Node> children = new ArrayList<>(CHILDREN_LIST_INITIALIZATION);
 	private final GameMove gameMove;
 	private int utilityValue = NO_VALUE;
+	private int levelsToAdd;
+	private int pruningValue;
 
 
 
@@ -87,26 +89,60 @@ public class Node {
 	}
 
 
+	public int getLevelsToAdd() {
+		return levelsToAdd;
+	}
 
 
-	public Node(Node parent, GameMove gameMove) {
+	public void setLevelsToAdd(int levelsToAdd) {
+		this.levelsToAdd = levelsToAdd;
+	}
+
+
+	public int getPruningValue() {
+		return pruningValue;
+	}
+
+
+	public void setPruningValue(int value) {
+		this.pruningValue = value;
+	}
+
+
+	public boolean isLeaf() {
+		return levelsToAdd <= 0 || gameMove.getGameState().gameEnded();
+	}
+
+
+	public boolean canHaveChildren() {
+		return !isLeaf();
+	}
+
+
+
+
+	public Node(Node parent, GameMove gameMove, int levelsToAdd) {
 		this.parent = parent;
 		this.gameMove = gameMove;
+		this.levelsToAdd = levelsToAdd;
 	}
 
 
 
 
 	public Node createChild(GameMove gameMove) {
-		Node node = new Node(this, gameMove);
+		Node node = new Node(this, gameMove, levelsToAdd - 1);
 		this.children.add(node);
 		return node;
 	}
 
 
-	public void remove() {
-		if (this.parent != null)
-			this.parent.children.remove(this);
+	public int countSubNodes(boolean includeSelf) {
+		int count = includeSelf ? 1 : 0;
+		for (Node child : children) {
+			count += child.countSubNodes(true);
+		}
+		return count;
 	}
 
 

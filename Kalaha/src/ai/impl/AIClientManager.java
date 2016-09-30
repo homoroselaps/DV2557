@@ -24,16 +24,20 @@ public class AIClientManager implements Cancellable {
 
 
 	private final CancellationTimer cancellationTimer;
-	private final TreeBuilder treeBuilder;
-	private boolean cancellationPending;
+	private final NodeBuilder nodeBuilder;
 	private boolean running;
-	private int depthReached;
+	private boolean cancellationPending;
 
 
 
 
-	public TreeBuilder getTreeBuilder() {
-		return treeBuilder;
+	public NodeBuilder getNodeBuilder() {
+		return nodeBuilder;
+	}
+
+
+	public boolean isRunning() {
+		return running;
 	}
 
 
@@ -43,42 +47,38 @@ public class AIClientManager implements Cancellable {
 
 
 	public void cancel() {
-		this.cancellationPending = true;
-	}
-
-
-	public boolean isRunning() {
-		return running;
+		if (running)
+			this.cancellationPending = true;
 	}
 
 
 	public int getDepthReached() {
-		return depthReached;
+		return nodeBuilder.getDepthReached();
 	}
 
 
 
 
-	public AIClientManager(TreeBuilder treeBuilder, long timeout) {
-		this.treeBuilder = treeBuilder;
-		this.cancellationTimer = new CancellationTimer(treeBuilder, timeout);
+	public AIClientManager(NodeBuilder nodeBuilder, long timeout) {
+		this.nodeBuilder = nodeBuilder;
+		this.cancellationTimer = new CancellationTimer(nodeBuilder, timeout);
 	}
 
 
-	public AIClientManager(TreeBuilder treeBuilder) {
-		this(treeBuilder, DEFAULT_TIMEOUT);
+	public AIClientManager(NodeBuilder nodeBuilder) {
+		this(nodeBuilder, DEFAULT_TIMEOUT);
 	}
 
 
 
 
 	public static AIClientManager fromTree(Tree tree) {
-		return new AIClientManager(new TreeBuilder(tree));
+		return fromTree(tree, DEFAULT_TIMEOUT);
 	}
 
 
 	public static AIClientManager fromTree(Tree tree, long timeout) {
-		return new AIClientManager(new TreeBuilder(tree), timeout);
+		return new AIClientManager(new NodeBuilder(tree), timeout);
 	}
 
 
@@ -89,7 +89,7 @@ public class AIClientManager implements Cancellable {
 			throw new IllegalStateException("Already running.");
 
 		cancellationTimer.start();
-		this.cancellationPending = false;
+		cancellationPending = false;
 		running = true;
 	}
 
@@ -104,26 +104,25 @@ public class AIClientManager implements Cancellable {
 	public boolean run(int customDepthLevel) {
 		start();
 
-		treeBuilder.build(customDepthLevel);
-		if (!treeBuilder.isCancellationPending())
-			depthReached += customDepthLevel;
+		boolean res = nodeBuilder.run(customDepthLevel);
 
 		end();
-		return treeBuilder.isCancellationPending();
+		return res;
 	}
 
 
 	public boolean run(DepthLevelSupplier depthLevelSupplier) {
 		start();
+
 		for (int depth : depthLevelSupplier) {
-			treeBuilder.build(depth);
-			if (this.cancellationPending || treeBuilder.isCancellationPending()) {
+			boolean res = nodeBuilder.run(nodeBuilder.getDepthReached() + depth);
+
+			if (this.cancellationPending || !res) {
 				end();
 				return false;
-			} else {
-				this.depthReached += depth;
 			}
 		}
+
 		end();
 		return true;
 	}
