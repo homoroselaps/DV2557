@@ -142,7 +142,7 @@ public class AIClientManager implements Cancellable {
 		for (int depth : depthLevelSupplier) {
 			boolean res = nodeBuilder.run(nodeBuilder.getDepthReached() + depth);
 
-			if (!res) {
+			if (!res || cancellationPending) {
 				end();
 				return false;
 			}
