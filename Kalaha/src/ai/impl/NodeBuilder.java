@@ -5,6 +5,7 @@ import ai.impl.structure.GameMove;
 import ai.impl.structure.Node;
 import ai.impl.util.Cancellable;
 
+import javax.swing.text.html.Option;
 import java.util.Iterator;
 
 
@@ -71,68 +72,60 @@ public class NodeBuilder implements Cancellable {
 
 
 	public boolean run(int depth) {
-		if (depth <= depthReached)
-			return true;
+			if (depth <= depthReached)
+				return true;
 
-		if (running)
-			throw new IllegalStateException("Already running.");
-		running = true;
-		cancellationPending = false;
+			if (running)
+				throw new IllegalStateException("Already running.");
+			running = true;
+			cancellationPending = false;
 
-		stepCount = 0;
-		Node root = clientManager.getRoot();
-		root.clearUtilityValue();
-		root.setLevelsToAdd(depth);
+			stepCount = 0;
+			Node root = clientManager.getRoot();
+			root.clearUtilityValue();
+			root.setLevelsToAdd(depth);
 
-		step(root, null);
+			step(root, null);
 
-		if (!cancellationPending) {
-			depthReached = depth;
-			selectedMove = root.getAmboToSelect();
-		}
+			if (!cancellationPending) {
+				depthReached = depth;
+				selectedMove = root.getAmboToSelect();
+			}
 
-		running = false;
-		return !cancellationPending;
+			running = false;
+			return !cancellationPending;
 	}
 
 
 	private void step(Node node, PruningManager.PruningCallback pruningCallback) {
-		if (cancellationPending)
-			return;
 
 		int sc = stepCount;
 		stepCount++;
 
 		if (node.isLeaf()) {
 			node.setUtilityValue(UtilityValueManager.getUtilityValueFromState(clientManager, node.getGameMove()));
-			node.setAmboToSelect(-1);
 			return;
 		}
 
-		// the node is not a leaf
-		node.clearUtilityValue();
-
 		Iterator<GameMove> gameMoveIterator = node.getGameMove().getGameMoveProvider().iterator();
 
-		if(!gameMoveIterator.hasNext())
-			node.setUtilityValue(UtilityValueManager.getUtilityValueFromState(clientManager, node.getGameMove()));
-
-		int i = -1;
 		while (gameMoveIterator.hasNext()) {
 			GameMove gameMove = gameMoveIterator.next();
-			i++;
 
 			Node child = node.createChild(gameMove);
 			PruningManager.PruningCallback pc = PruningManager.onNodeChildCreated(node, child);
+
+
+			if (cancellationPending)
+				break;
+
 			step(child, pc);
 			PruningManager.onNodeChildProcessed(node, child);
 
-			if (cancellationPending || pruningCallback != null && pruningCallback.shouldPrune(child))
-				break; // prune
+			if (pruningCallback != null && pruningCallback.shouldPrune(child))
+				break;
 
 		}
-
-		return;
 
 	}
 

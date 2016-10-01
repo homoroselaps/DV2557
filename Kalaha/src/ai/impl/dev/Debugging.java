@@ -46,7 +46,7 @@ public class Debugging {
 	}
 
 
-	private void addText(String msg) {
+	protected void addText(String msg) {
 		System.out.println(msg);
 	}
 
@@ -104,16 +104,17 @@ public class Debugging {
 
 
 	private int getAIMove(GameState currentBoard) {
-		AIClientManager clientManager = AIClientManager.create(currentBoard, 4990L);
-//		DepthLevelSupplier depthLevelSupplier = StartArrayDepthLevelSupplier.create(4, 4);
-		DepthLevelSupplier depthLevelSupplier = StartArrayDepthLevelSupplier.createNoLimit(2, 10, 4);
+		AIClientManager clientManager = AIClientManager.create(currentBoard, 99999999999L);
+//		AIClientManager clientManager = AIClientManager.create(currentBoard, 4990L);
+
+		DepthLevelSupplier depthLevelSupplier = StartArrayDepthLevelSupplier.create(6, 6);
+//		DepthLevelSupplier depthLevelSupplier = StartArrayDepthLevelSupplier.createNoLimit(1, 2);
 
 		clientManager.run(depthLevelSupplier);
 
 		addText("Depth reached: " + clientManager.getDepthReached());
 		addText("Utility Value: " + clientManager.getRoot().getUtilityValue());
 		addText("Selected ambo: " + clientManager.getRoot().getAmboToSelect());
-//		addText("Children reached: " + clientManager.getRoot().children.size());
 
 		return clientManager.getSelectedMove();
 	}

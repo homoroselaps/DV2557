@@ -24,7 +24,7 @@ public class Node {
 	private int utilityValue = NO_VALUE;
 	private int levelsToAdd;
 	private int amboToSelect = -1;
-//	public List<Node> children = new ArrayList<>(6);
+	public List<Node> children = new ArrayList<>(6);
 
 
 
@@ -111,7 +111,7 @@ public class Node {
 
 	public Node createChild(GameMove gameMove) {
 		Node node = new Node(gameMove, levelsToAdd - 1);
-//		this.children.add(node);
+		this.children.add(node);
 		return node;
 	}
 

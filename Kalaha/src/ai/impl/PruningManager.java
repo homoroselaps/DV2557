@@ -2,6 +2,7 @@ package ai.impl;
 
 
 import ai.impl.structure.Node;
+import com.sun.javafx.image.BytePixelSetter;
 
 import javax.swing.text.AsyncBoxView;
 
@@ -25,9 +26,7 @@ public final class PruningManager {
 		if (node.getNextPlayer() == child.getNextPlayer()) {
 			child.setUtilityValue(node.getUtilityValue()); // the child needs to exceed the threshold
 			return null; // we shouldn't prune here
-		}
-
-		if (node.getNextPlayer() != child.getNextPlayer()) {
+		} else {
 			// inject child checking
 			return new PruningCallback() {
 				@Override
@@ -44,8 +43,6 @@ public final class PruningManager {
 				}
 			};
 		}
-
-		return null;
 	}
 
 
@@ -54,28 +51,17 @@ public final class PruningManager {
 			node.setUtilityValue(child.getUtilityValue());
 			node.setAmboToSelect(child.getGameMove().getSelectedAmbo());
 			return;
+
+		} else {
+			int nodeUtilityValue = node.getUtilityValue();
+			int childUtilityValue = child.getUtilityValue();
+
+			if ((node.getNextPlayer() && childUtilityValue > nodeUtilityValue)
+					|| (!node.getNextPlayer() && childUtilityValue < nodeUtilityValue)) {
+				node.setUtilityValue(childUtilityValue);
+				node.setAmboToSelect(child.getGameMove().getSelectedAmbo());
+			}
 		}
-		int nodeUtilityValue = node.getUtilityValue();
-		int childUtilityValue = child.getUtilityValue();
-
-//		if (node.getNextPlayer()) {
-//			if (childUtilityValue > nodeUtilityValue) {
-//				node.setUtilityValue(childUtilityValue);
-//				node.setAmboToSelect(child.getGameMove().getSelectedAmbo());
-//			}
-//		} else {
-//			if (childUtilityValue < nodeUtilityValue) {
-//				node.setUtilityValue(childUtilityValue);
-//				node.setAmboToSelect(child.getGameMove().getSelectedAmbo());
-//			}
-//		}
-
-		if ((node.getNextPlayer() && childUtilityValue > nodeUtilityValue)
-				|| (!node.getNextPlayer() && childUtilityValue < nodeUtilityValue)) {
-			node.setUtilityValue(childUtilityValue);
-			node.setAmboToSelect(child.getGameMove().getSelectedAmbo());
-		}
-
 	}
 
 

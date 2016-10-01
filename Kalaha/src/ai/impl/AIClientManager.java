@@ -30,7 +30,6 @@ public class AIClientManager implements Cancellable {
 	private final int minPlayer;
 	private final CancellationTimer cancellationTimer;
 	private final NodeBuilder nodeBuilder;
-	private int selectedMove;
 	private boolean running;
 	private volatile boolean cancellationPending;
 
@@ -58,7 +57,7 @@ public class AIClientManager implements Cancellable {
 
 
 	public int getSelectedMove() {
-		return selectedMove;
+		return nodeBuilder.getSelectedMove();
 	}
 
 
@@ -146,8 +145,6 @@ public class AIClientManager implements Cancellable {
 			if (!res) {
 				end();
 				return false;
-			} else {
-				this.selectedMove = nodeBuilder.getSelectedMove();
 			}
 		}
 
