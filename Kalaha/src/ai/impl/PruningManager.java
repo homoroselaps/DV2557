@@ -28,20 +28,24 @@ public final class PruningManager {
 			return null; // we shouldn't prune here
 		} else {
 			// inject child checking
-			return new PruningCallback() {
-				@Override
-				public boolean shouldPrune(Node grandChild) {
+			if (!node.hasUtilityValue())
+				return null;
+			else {
+				return new PruningCallback() {
+					@Override
+					public boolean shouldPrune(Node grandChild) {
 //					return false;
-					if (node.getNextPlayer()) { // maximizer
-						if (grandChild.getUtilityValue() < node.getUtilityValue())
-							return true;
-					} else { // minimizer
-						if (grandChild.getUtilityValue() > node.getUtilityValue())
-							return true;
+						if (node.getNextPlayer()) { // maximizer
+							if (grandChild.getUtilityValue() < node.getUtilityValue())
+								return true;
+						} else { // minimizer
+							if (grandChild.getUtilityValue() > node.getUtilityValue())
+								return true;
+						}
+						return false;
 					}
-					return false;
-				}
-			};
+				};
+			}
 		}
 	}
 
