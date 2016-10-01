@@ -5,7 +5,6 @@ import kalaha.GameState;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 
 /**
  * The Maximizer node implementation of {@link Node}.
@@ -36,25 +35,32 @@ public class MaxNode extends Node {
     }
 
     @Override
-    public int getUtilityValue(int maxDepth, int dontLookBelow, int dontLookAbove) {
-        if(this.getDepth()<=maxDepth && !this.getGameState().gameEnded()){
+    public Node findBestChild(int maxDepth, int dontLookBelow, int dontLookAbove) {
+        if(this.getDepth()<maxDepth && !this.getGameState().gameEnded()){
             // not a leaf node
-            ArrayList<Integer> values = new ArrayList<>();
+            ArrayList<Node> values = new ArrayList<>();
             for(Node node : this){
-                int val = node.getUtilityValue(maxDepth, dontLookBelow, dontLookAbove);
+                Node child = node.findBestChild(maxDepth, dontLookBelow, dontLookAbove);
+                int val = child.getUtilityValue();
                 if(val > dontLookBelow){
                     dontLookBelow = val;
                 }
                 if(val>dontLookAbove){
-                    return val;
+                    this.setUtilityValue(val);
+                    return this;
                 }
+                values.add(child);
             }
-            return Collections.max(values);
+            Node best = Collections.max(values);
+            this.setUtilityValue(best.getUtilityValue());
+            return this;
         } else {
             // leaf node
             final GameState game = this.getGameState();
-            return game.getScore(game.getNextPlayer());
+            int maxScore = game.getScore(game.getNextPlayer());
+            int minScore = game.getScore((game.getNextPlayer()%2)+1);
+            this.setUtilityValue(maxScore*2 - minScore);
+            return this;
         }
     }
-
 }

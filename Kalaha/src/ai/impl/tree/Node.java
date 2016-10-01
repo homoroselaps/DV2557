@@ -1,7 +1,6 @@
 package ai.impl.tree;
 
 
-import ai.impl.UtilityManager;
 import kalaha.GameState;
 
 import java.util.HashMap;
@@ -13,7 +12,7 @@ import java.util.Map;
  * A node of the {@link Tree}
  * Created by Nejc on 23. 09. 2016.
  */
-public abstract class Node implements Iterable<Node>{
+public abstract class Node implements Iterable<Node>, Comparable<Node>{
 
 
     private static final int CHILDREN_LIST_INITIALIZATION = 6;
@@ -92,15 +91,15 @@ public abstract class Node implements Iterable<Node>{
 
     public abstract Node getChildForMove(int i);
 
-    public abstract int getUtilityValue(int maxDepth, int notBelow, int notAbove);
+    public abstract Node findBestChild(int maxDepth, int dontLookBelow, int dontLookAbove);
 
     @Override
     public Iterator<Node> iterator() {
         return new Iterator<Node>() {
-            int ambo = 1;
+            int ambo = 0;
             @Override
             public boolean hasNext() {
-                for(int i=ambo; i<7; i++){
+                for(int i=ambo+1; i<7; i++){
                     if(getGameState().moveIsPossible(i)){
                         ambo = i;
                         return true;
@@ -113,10 +112,17 @@ public abstract class Node implements Iterable<Node>{
             public Node next() {
                 Node result = getChildren().get(ambo);
                 if(result==null){
-                    getChildren().put(ambo, getChildForMove(ambo));
+                    Node newNode = getChildForMove(ambo);
+                    getChildren().put(ambo, newNode);
+                    result = newNode;
                 }
                 return result;
             }
         };
+    }
+
+    @Override
+    public int compareTo(Node node) {
+        return getUtilityValue() - node.getUtilityValue();
     }
 }

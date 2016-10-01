@@ -4,7 +4,6 @@ package ai.impl.tree;
 import kalaha.GameState;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 
 /**
@@ -35,24 +34,32 @@ public class MinNode extends Node {
     }
 
     @Override
-    public int getUtilityValue(int maxDepth, int dontLookBelow, int dontLookAbove) {
-        if(this.getDepth()<=maxDepth && !this.getGameState().gameEnded()){
+    public Node findBestChild(int maxDepth, int dontLookBelow, int dontLookAbove) {
+        if(this.getDepth()<maxDepth && !this.getGameState().gameEnded()){
             // not a leaf node
-            ArrayList<Integer> values = new ArrayList<>();
+            ArrayList<Node> values = new ArrayList<>();
             for(Node node : this){
-                int val = node.getUtilityValue(maxDepth, dontLookBelow, dontLookAbove);
+                Node child = node.findBestChild(maxDepth, dontLookBelow, dontLookAbove);
+                int val = child.getUtilityValue();
                 if(val < dontLookAbove){
                     dontLookAbove = val;
                 }
                 if(val<dontLookBelow){
-                    return val;
+                    this.setUtilityValue(val);
+                    return this;
                 }
+                values.add(child);
             }
-            return Collections.min(values);
+            Node best = Collections.min(values);
+            this.setUtilityValue(best.getUtilityValue());
+            return this;
         } else {
             // leaf node
             final GameState game = this.getGameState();
-            return game.getScore(game.getNextPlayer());
+            int maxScore = game.getScore((game.getNextPlayer()%2)+1);
+            int minScore = game.getScore(game.getNextPlayer());
+            this.setUtilityValue(maxScore*2 - minScore);
+            return this;
         }
     }
 }

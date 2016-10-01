@@ -1,10 +1,11 @@
 package ai;
 
-import ai.Global;
 import java.io.*;
 import java.net.*;
 import javax.swing.*;
 import java.awt.*;
+
+import ai.impl.tree.SimpleTreeBuilder;
 import kalaha.*;
 
 /**
@@ -212,8 +213,11 @@ public class AIClient implements Runnable
      */
     public int getMove(GameState currentBoard)
     {
-        int myMove = getRandom();
-        return myMove;
+        SimpleTreeBuilder tb = new SimpleTreeBuilder(currentBoard);
+        int move = tb.getBestMove(12);
+        addText("Last util-val: " + tb.getLastUtil());
+        addText("Last depth: " + tb.getLastDepth());
+        return move;
     }
     
     /**

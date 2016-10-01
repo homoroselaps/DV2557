@@ -1,7 +1,5 @@
 package ai.impl.tree;
 
-import kalaha.GameState;
-
 /**
  * Interface that provides methods for tree building
  *
@@ -9,6 +7,6 @@ import kalaha.GameState;
  */
 public interface TreeBuilder {
 
-    void buildUntil(int level);
+    int getBestMove(int level);
 
 }

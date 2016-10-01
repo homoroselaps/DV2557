@@ -11,7 +11,8 @@ import java.util.*;
 public class SimpleTreeBuilder implements TreeBuilder{
     private final GameState startingGame;
     private final Tree tree;
-    private int depth;
+    private int lastDepth;
+    private int lastUtil;
 
     /**
      * Creates new {@link SimpleTreeBuilder} based on a (starting) game state
@@ -23,17 +24,19 @@ public class SimpleTreeBuilder implements TreeBuilder{
     }
 
     @Override
-    public void buildUntil(int level) {
-        tree.getRoot().getUtilityValue();
+    public int getBestMove(int level) {
+        Node best = tree.getRoot().findBestChild(level, Integer.MIN_VALUE, Integer.MAX_VALUE);
+        lastUtil = best.getUtilityValue();
+        lastDepth = level;
+        int move = Collections.max(best.getChildren().values()).getLastMove();
+        return move;
     }
 
-    public int getBestMove(){
-        Collection<Node> alternatives = tree.getRoot().getChildren().values();
-        Node best = Collections.max(alternatives, new Comparator<Node>() {
-            @Override
-            public int compare(Node node, Node t1) {
-                return node.g;
-            }
-        })
+    public int getLastDepth() {
+        return lastDepth;
+    }
+
+    public int getLastUtil() {
+        return lastUtil;
     }
 }
