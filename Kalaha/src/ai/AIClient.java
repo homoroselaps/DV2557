@@ -1,10 +1,14 @@
 package ai;
 
-import ai.Global;
 import java.io.*;
 import java.net.*;
 import javax.swing.*;
 import java.awt.*;
+
+import ai.impl.AIClientManager;
+import ai.impl.DepthLevelSupplier;
+import ai.impl.GameUtility;
+import ai.impl.StartArrayDepthLevelSupplier;
 import kalaha.*;
 
 /**
@@ -212,8 +216,23 @@ public class AIClient implements Runnable
      */
     public int getMove(GameState currentBoard)
     {
-        int myMove = getRandom();
-        return myMove;
+
+	    try {
+
+            AIClientManager clientManager = AIClientManager.create(currentBoard, 4980);
+            DepthLevelSupplier depthLevelSupplier = StartArrayDepthLevelSupplier.create(100, 2, 2, 6, 4);
+
+            clientManager.run(depthLevelSupplier);
+
+            return clientManager.getSelectedMove();
+
+        } catch (Exception ex) {
+
+		    this.addText("AI internal error: " + ex.getMessage());
+		    return GameUtility.getFirstAvailableMove(currentBoard);
+
+	    }
+
     }
     
     /**
