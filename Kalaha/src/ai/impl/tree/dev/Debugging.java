@@ -2,6 +2,7 @@ package ai.impl.tree.dev;
 
 
 import ai.impl.tree.SimpleTreeBuilder;
+import ai.impl.tree.TimedBuilder;
 import ai.impl.tree.TreeBuilder;
 import kalaha.GameState;
 
@@ -100,8 +101,13 @@ public class Debugging {
 
 
     private int getAIMove(GameState currentBoard) {
-        TreeBuilder tb = new SimpleTreeBuilder(currentBoard);
-        return tb.getBestMove(12);
+        TimedBuilder tb = TimedBuilder.buildFor(currentBoard, 5000);
+        System.out.println("Depth: " + tb.getDepth());
+        System.out.println("Util: " + tb.getUtility());
+        return tb.getMove();
+/*        TreeBuilder tb = new SimpleTreeBuilder(currentBoard);
+        return tb.getBestMove(12);*/
+
 //        AIClientManager clientManager = AIClientManager.create(currentBoard, 5000L);
 ////		DepthLevelSupplier depthLevelSupplier = StartArrayDepthLevelSupplier.create(5, 2, 3);
 //        DepthLevelSupplier depthLevelSupplier = StartArrayDepthLevelSupplier.createNoLimit(2, 6, 4);

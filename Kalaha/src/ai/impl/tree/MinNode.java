@@ -58,7 +58,7 @@ public class MinNode extends Node {
             final GameState game = this.getGameState();
             int maxScore = game.getScore((game.getNextPlayer()%2)+1);
             int minScore = game.getScore(game.getNextPlayer());
-            this.setUtilityValue(maxScore*2 - minScore);
+            this.setUtilityValue(maxScore - minScore);
             return this;
         }
     }

@@ -6,6 +6,7 @@ import javax.swing.*;
 import java.awt.*;
 
 import ai.impl.tree.SimpleTreeBuilder;
+import ai.impl.tree.TimedBuilder;
 import kalaha.*;
 
 /**
@@ -213,11 +214,15 @@ public class AIClient implements Runnable
      */
     public int getMove(GameState currentBoard)
     {
-        SimpleTreeBuilder tb = new SimpleTreeBuilder(currentBoard);
-        int move = tb.getBestMove(12);
-        addText("Last util-val: " + tb.getLastUtil());
-        addText("Last depth: " + tb.getLastDepth());
-        return move;
+        TimedBuilder tb = TimedBuilder.buildFor(currentBoard, 4500);
+        addText("Depth reached : " + tb.getDepth());
+        addText("Utility value: " + tb.getUtility());
+        return tb.getMove();
+//        SimpleTreeBuilder tb = new SimpleTreeBuilder(currentBoard);
+//        int move = tb.getBestMove(6);
+//        addText("Last util-val: " + tb.getLastUtil());
+//        addText("Last depth: " + tb.getLastDepth());
+//        return move;
     }
     
     /**
