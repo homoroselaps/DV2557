@@ -229,20 +229,15 @@ public class AIClient implements Runnable
     {
         moveCount++;
 	    try {
-<<<<<<< HEAD
+
             if (moveCount == 1) {
                 if (TRAIN_AI) firstMove  = (int) (Math.random() * 6 + 1);
                 else firstMove = lookupManager.getBestMove();
                 return firstMove;
             }
-            AIClientManager clientManager = AIClientManager.create(currentBoard, 4990L);
-            DepthLevelSupplier depthLevelSupplier = StartArrayDepthLevelSupplier.createNoLimit(2, 3, 7, 4);
-=======
-
             AIClientManager clientManager = AIClientManager.create(currentBoard, 4980);
             DepthLevelSupplier depthLevelSupplier = StartArrayDepthLevelSupplier.create(100, 2, 2, 6, 4);
 
->>>>>>> refs/remotes/origin/master
             clientManager.run(depthLevelSupplier);
 
             return clientManager.getSelectedMove();
