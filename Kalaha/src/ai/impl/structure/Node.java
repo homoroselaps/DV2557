@@ -12,7 +12,6 @@ import static ai.impl.UtilityValueManager.NO_VALUE;
 
 
 /**
- *
  * Created by Nejc on 23. 09. 2016.
  */
 public class Node {
@@ -21,10 +20,41 @@ public class Node {
 
 
 	private final GameMove gameMove;
-	private int utilityValue = NO_VALUE;
 	private int levelsToAdd;
 	private int amboToSelect = -1;
-	public List<Node> children = new ArrayList<>(6);
+	private int utilityValue = NO_VALUE;
+
+
+
+
+	/**
+	 * Gets the move that resulted in this node.
+	 *
+	 * @return Game move that resulted in this node.
+	 */
+	public GameMove getGameMove() {
+		return gameMove;
+	}
+
+
+	public int getLevelsToAdd() {
+		return levelsToAdd;
+	}
+
+
+	public void setLevelsToAdd(int levelsToAdd) {
+		this.levelsToAdd = levelsToAdd;
+	}
+
+
+	public int getAmboToSelect() {
+		return amboToSelect;
+	}
+
+
+	public void setAmboToSelect(int amboToSelect) {
+		this.amboToSelect = amboToSelect;
+	}
 
 
 
@@ -49,14 +79,6 @@ public class Node {
 	}
 
 
-	/**
-	 * Gets the move that resulted in this node.
-	 *
-	 * @return Game move that resulted in this node.
-	 */
-	public GameMove getGameMove() {
-		return gameMove;
-	}
 
 
 	/**
@@ -69,16 +91,6 @@ public class Node {
 	}
 
 
-	public int getLevelsToAdd() {
-		return levelsToAdd;
-	}
-
-
-	public void setLevelsToAdd(int levelsToAdd) {
-		this.levelsToAdd = levelsToAdd;
-	}
-
-
 	public boolean isLeaf() {
 		return levelsToAdd <= 0 || gameMove.getGameState().gameEnded();
 	}
@@ -86,16 +98,6 @@ public class Node {
 
 	public boolean canHaveChildren() {
 		return !isLeaf();
-	}
-
-
-	public int getAmboToSelect() {
-		return amboToSelect;
-	}
-
-
-	public void setAmboToSelect(int amboToSelect) {
-		this.amboToSelect = amboToSelect;
 	}
 
 
@@ -111,7 +113,6 @@ public class Node {
 
 	public Node createChild(GameMove gameMove) {
 		Node node = new Node(gameMove, levelsToAdd - 1);
-		this.children.add(node);
 		return node;
 	}
 
