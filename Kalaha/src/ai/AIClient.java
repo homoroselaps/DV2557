@@ -34,7 +34,7 @@ public class AIClient implements Runnable
     private int firstMove;
     private LookUpManager lookupManager = new LookUpManager();
     private int moveCount = 0;
-    private final boolean TRAIN_AI = true;
+
     	
     /**
      * Creates a new client.
@@ -146,12 +146,12 @@ public class AIClient implements Runnable
                     if (w == player)
                     {
                         addText("I won!");
-                        if (TRAIN_AI) saveGame(firstMove, 1);
+                         saveGame(firstMove, 1);
                     }
                     else
                     {
                         addText("I lost...");
-                        if (TRAIN_AI) saveGame(firstMove, 0);
+                        saveGame(firstMove, 0);
                     }
                     running = false;
                 }
@@ -231,8 +231,8 @@ public class AIClient implements Runnable
 	    try {
 
             if (moveCount == 1) {
-                if (TRAIN_AI) firstMove  = (int) (Math.random() * 6 + 1);
-                else firstMove = lookupManager.getBestMove();
+              //We select the best 1. move from game.txt
+              firstMove = lookupManager.getBestMove();
                 return firstMove;
             }
             AIClientManager clientManager = AIClientManager.create(currentBoard, 4980);
@@ -257,10 +257,7 @@ public class AIClient implements Runnable
      * 
      * @return Random ambo number
      */
-    public int getRandom()
-    {
-        return 1 + (int)(Math.random() * 6);
-    }
+
 
     private void saveGame(int firstMove, int playerWon) {
         String line= firstMove+";"+playerWon+"\n";
