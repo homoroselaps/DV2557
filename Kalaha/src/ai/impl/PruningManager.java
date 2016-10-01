@@ -2,6 +2,9 @@ package ai.impl;
 
 
 import ai.impl.structure.Node;
+import com.sun.javafx.image.BytePixelSetter;
+
+import javax.swing.text.AsyncBoxView;
 
 
 
@@ -10,75 +13,70 @@ import ai.impl.structure.Node;
  * Manages pruning.
  * Created by Nejc on 23. 09. 2016.
  */
-public class PruningManager {
+public final class PruningManager {
 
 
-
-
-	private int alpha;
-	private int beta;
-
-
-
-
-	public int getAlpha() {
-		return alpha;
-	}
-
-
-	public int getBeta() {
-		return beta;
+	private PruningManager() {
 	}
 
 
 
 
-	public PruningManager() {
-		alpha = 0;
-		beta = Integer.MAX_VALUE;
+	public static PruningCallback onNodeChildCreated(final Node node, Node child) {
+		if (node.getNextPlayer() == child.getNextPlayer()) {
+			child.setUtilityValue(node.getUtilityValue()); // the child needs to exceed the threshold
+			return null; // we shouldn't prune here
+		} else {
+			// inject child checking
+			return new PruningCallback() {
+				@Override
+				public boolean shouldPrune(Node grandChild) {
+//					return false;
+					if (node.getNextPlayer()) { // maximizer
+						if (grandChild.getUtilityValue() < node.getUtilityValue())
+							return true;
+					} else { // minimizer
+						if (grandChild.getUtilityValue() > node.getUtilityValue())
+							return true;
+					}
+					return false;
+				}
+			};
+		}
+	}
+
+
+	public static void onNodeChildProcessed(Node node, Node child) {
+		if (!node.hasUtilityValue()) { // first node
+			node.setUtilityValue(child.getUtilityValue());
+			node.setAmboToSelect(child.getGameMove().getSelectedAmbo());
+			return;
+
+		} else {
+			int nodeUtilityValue = node.getUtilityValue();
+			int childUtilityValue = child.getUtilityValue();
+
+			if ((node.getNextPlayer() && childUtilityValue > nodeUtilityValue)
+					|| (!node.getNextPlayer() && childUtilityValue < nodeUtilityValue)) {
+				node.setUtilityValue(childUtilityValue);
+				node.setAmboToSelect(child.getGameMove().getSelectedAmbo());
+			}
+		}
 	}
 
 
 
 
-	/**
-	 * Updates associated data and checks if pruning can be done.
-	 *
-	 * @param value The Maximizer's utility value
-	 * @return Whether or not to prune
-	 */
-	public boolean resolveMaximizerValue(int value) {
-		// "If the retrieved value is higher than Alpha, we update the Alpha."
-		if (value > alpha)
-			alpha = value;
 
-		// "If the current value is higher than Beta, we prune!"
-		return value > beta;
+
+
+
+	public interface PruningCallback {
+
+
+		boolean shouldPrune(Node grandChild);
+
+
 	}
-
-
-	/**
-	 * Updates associated data and checks if pruning can be done.
-	 *
-	 * @param value The Minimizer's utility value
-	 * @return Whether or not to prune
-	 */
-	public boolean resolveMinimizerValue(int value) {
-		// If the retrieved value is lower than Beta, we update the Beta.
-		if (value < beta)
-			beta = value;
-
-		// If the current value is lower than Alpha, we prune!
-		return value < alpha;
-	}
-
-
-	public boolean resolveNodeValue(Node node) {
-		if (node.getParent().getGameMove().getNextPlayer())
-			return resolveMaximizerValue(node.getUtilityValue()); // parent is a maximizer
-		else
-			return resolveMinimizerValue(node.getUtilityValue()); // parent is a minimizer
-	}
-
 
 }

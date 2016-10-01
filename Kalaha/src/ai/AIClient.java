@@ -10,7 +10,6 @@ import ai.impl.DepthLevelSupplier;
 import ai.impl.GameUtility;
 import ai.impl.LookUpManager;
 import ai.impl.StartArrayDepthLevelSupplier;
-import ai.impl.structure.Tree;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import kalaha.*;
@@ -235,17 +234,12 @@ public class AIClient implements Runnable
                 else firstMove = lookupManager.getBestMove();
                 return firstMove;
             }
-		    Tree tree = Tree.create(currentBoard);
-		    DepthLevelSupplier depthLevelSupplier = StartArrayDepthLevelSupplier.createNoLimit(2, 5, 3);
-		    AIClientManager aiClientManager = AIClientManager.fromTree(tree);
+            AIClientManager clientManager = AIClientManager.create(currentBoard, 4990L);
+            DepthLevelSupplier depthLevelSupplier = StartArrayDepthLevelSupplier.createNoLimit(2, 3, 7, 4);
+            clientManager.run(depthLevelSupplier);
+            addText("Depth reached: " + clientManager.getDepthReached());
 
-		    aiClientManager.run(depthLevelSupplier);
-            int selectedAmbo = tree.getBestMove().getSelectedAmbo();
-
-            this.addText("Depth reached: " + aiClientManager.getDepthReached());
-            this.addText("Selected ambo: " + selectedAmbo);
-
-		    return selectedAmbo;
+            return clientManager.getSelectedMove();
 
 	    } catch (Exception ex) {
 

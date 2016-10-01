@@ -4,8 +4,10 @@ package ai.impl.dev;
 import ai.impl.AIClientManager;
 import ai.impl.DepthLevelSupplier;
 import ai.impl.StartArrayDepthLevelSupplier;
-import ai.impl.structure.Tree;
 import kalaha.GameState;
+
+import javax.swing.text.AsyncBoxView;
+import java.util.Random;
 
 
 
@@ -18,6 +20,9 @@ public class Debugging {
 
 
 	private GameState gameState;
+	private Random random = new Random();
+
+
 
 
 	public Debugging() {
@@ -27,65 +32,91 @@ public class Debugging {
 
 
 
-	private void run() {
-		boolean startWithAI = true;
-		while (!gameState.gameEnded()) {
-			if (startWithAI) {
-				System.out.print("AI's move ... ");
-				int move = getAIMove(gameState);
-				System.out.println(move);
-				gameState.makeMove(move);
-			} else {
-				int move = getPlayerMove(gameState);
-				System.out.println("Player's turn ... " + move);
-				gameState.makeMove(move);
-			}
-			startWithAI = !startWithAI;
-		}
-		int winner = gameState.getWinner();
-		System.out.println(winner >= 1
-				? "Winner: " + (startWithAI ? "AI" : "Player")
-				: "Draw"
-		);
+	public static void main(String[] args) {
+		//while (true) {
+		System.out.println("Starting a new game...\n");
+		Debugging d = new Debugging();
+		d.run();
+		//}
 	}
 
 
-	private void addText(String msg) {
+	private static int getRandom() {
+		return 1 + (int) (Math.random() * 6);
+	}
+
+
+	protected void addText(String msg) {
 		System.out.println(msg);
 	}
 
 
-	private int getPlayerMove(GameState currentBoard) {
-		for (int i = 1; i <= 6; i++) {
-			if (currentBoard.moveIsPossible(i))
-				return i;
-		}
-		return -1;
+	private int getOpponentMove(GameState currentBoard) {
+		int selectedAmbo = getRandom();
+		while (!currentBoard.moveIsPossible(selectedAmbo))
+			selectedAmbo = getRandom();
+		return selectedAmbo;
 	}
+
+
+
+
+	private void run() {
+		boolean startWithAI = true;
+		int ai = startWithAI ? 1 : 2;
+		int opponent = (ai % 2) + 1;
+
+		while (!gameState.gameEnded()) {
+			if (gameState.getNextPlayer() == ai) {
+
+				System.out.println("AI's move ... ");
+
+				TimeTracker.PUBLIC_INSTANCE.start();
+				int move = getAIMove(gameState);
+				TimeTracker.PUBLIC_INSTANCE.stopPrint();
+
+				gameState.makeMove(move);
+
+			} else {
+
+				int move = getOpponentMove(gameState);
+				System.out.println("Opponent's turn ... "); // + move);
+				gameState.makeMove(move);
+			}
+
+			this.addText("");
+		}
+
+		int winner = gameState.getWinner();
+		if (winner >= 1) {
+			System.out.println("Winner: " + (winner == ai ? "AI" : "Player"));
+			System.out.println("---------------------");
+			System.out.println("Score AI: " + gameState.getScore(ai));
+			System.out.println("Score Opp: " + gameState.getScore(opponent));
+			System.out.println("Score Diff: " + (gameState.getScore(winner) - gameState.getScore((winner % 2) + 1)));
+		} else {
+			System.out.println("Draw");
+		}
+
+	}
+
+
 
 
 	private int getAIMove(GameState currentBoard) {
-		Tree tree = Tree.create(currentBoard);
-		DepthLevelSupplier depthLevelSupplier = StartArrayDepthLevelSupplier.create(3, 1, 2);
-		AIClientManager aiClientManager = AIClientManager.fromTree(tree, 90000000L);
+		AIClientManager clientManager = AIClientManager.create(currentBoard, 99999999999L);
+//		AIClientManager clientManager = AIClientManager.create(currentBoard, 4990L);
 
-		aiClientManager.run(depthLevelSupplier);
+		DepthLevelSupplier depthLevelSupplier = StartArrayDepthLevelSupplier.create(6, 6);
+//		DepthLevelSupplier depthLevelSupplier = StartArrayDepthLevelSupplier.createNoLimit(1, 2);
 
-		this.addText("Depth reached: " + aiClientManager.getDepthReached());
-		return tree.getBestMove().getSelectedAmbo();
-	}
+		clientManager.run(depthLevelSupplier);
 
+		addText("Depth reached: " + clientManager.getDepthReached());
+		addText("Utility Value: " + clientManager.getRoot().getUtilityValue());
+		addText("Selected ambo: " + clientManager.getRoot().getAmboToSelect());
 
-
-
-
-
-	public static void main(String[] args) {
-		//while (true) {
-		System.out.println("Starting a new game...");
-		Debugging d = new Debugging();
-		d.run();
-		//}
+		return clientManager.getSelectedMove();
 	}
 
 

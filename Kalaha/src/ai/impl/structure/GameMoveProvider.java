@@ -47,7 +47,7 @@ public class GameMoveProvider implements Iterable<GameMove> {
 	protected static class Itr implements Iterator<GameMove> {
 
 
-		private static final int AMBO_COUNT = 3; // TODO: debug
+		private static final int AMBO_COUNT = 6; // TODO: debug
 		private static final int MIN_AMBO_INDEX = 1;
 		private static final int MAX_AMBO_INDEX = MIN_AMBO_INDEX + AMBO_COUNT - 1;
 

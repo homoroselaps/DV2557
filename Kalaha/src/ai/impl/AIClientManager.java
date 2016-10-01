@@ -1,9 +1,11 @@
 package ai.impl;
 
 
-import ai.impl.structure.Tree;
+import ai.impl.structure.GameMove;
+import ai.impl.structure.Node;
 import ai.impl.util.Cancellable;
 import ai.impl.util.CancellationTimer;
+import kalaha.GameState;
 
 
 
@@ -23,17 +25,44 @@ public class AIClientManager implements Cancellable {
 	public static final long DEFAULT_TIMEOUT = 4900;
 
 
+	private final Node root;
+	private final int maxPlayer;
+	private final int minPlayer;
 	private final CancellationTimer cancellationTimer;
-	private final TreeBuilder treeBuilder;
-	private boolean cancellationPending;
+	private final NodeBuilder nodeBuilder;
 	private boolean running;
-	private int depthReached;
+	private volatile boolean cancellationPending;
 
 
 
 
-	public TreeBuilder getTreeBuilder() {
-		return treeBuilder;
+	public Node getRoot() {
+		return root;
+	}
+
+
+	public int getMaxPlayer() {
+		return maxPlayer;
+	}
+
+
+	public int getMinPlayer() {
+		return minPlayer;
+	}
+
+
+	public NodeBuilder getNodeBuilder() {
+		return nodeBuilder;
+	}
+
+
+	public int getSelectedMove() {
+		return nodeBuilder.getSelectedMove();
+	}
+
+
+	public boolean isRunning() {
+		return running;
 	}
 
 
@@ -43,42 +72,38 @@ public class AIClientManager implements Cancellable {
 
 
 	public void cancel() {
-		this.cancellationPending = true;
-	}
-
-
-	public boolean isRunning() {
-		return running;
+		if (running)
+			this.cancellationPending = true;
 	}
 
 
 	public int getDepthReached() {
-		return depthReached;
+		return nodeBuilder.getDepthReached();
 	}
 
 
 
 
-	public AIClientManager(TreeBuilder treeBuilder, long timeout) {
-		this.treeBuilder = treeBuilder;
-		this.cancellationTimer = new CancellationTimer(treeBuilder, timeout);
+	private AIClientManager(Node root, int maxPlayer, long timeout) {
+		this.root = root;
+		this.maxPlayer = maxPlayer;
+		this.minPlayer = (maxPlayer % 2) + 1;
+		this.nodeBuilder = new NodeBuilder(this);
+		this.cancellationTimer = new CancellationTimer(nodeBuilder, timeout);
 	}
 
 
-	public AIClientManager(TreeBuilder treeBuilder) {
-		this(treeBuilder, DEFAULT_TIMEOUT);
+
+
+	public static AIClientManager create(GameState gameState, long timeout) {
+		GameMove gameMove = GameMove.create(gameState, true);
+		Node node = new Node(gameMove, 0);
+		return new AIClientManager(node, gameState.getNextPlayer(), timeout);
 	}
 
 
-
-
-	public static AIClientManager fromTree(Tree tree) {
-		return new AIClientManager(new TreeBuilder(tree));
-	}
-
-
-	public static AIClientManager fromTree(Tree tree, long timeout) {
-		return new AIClientManager(new TreeBuilder(tree), timeout);
+	public static AIClientManager create(GameState gameState) {
+		return create(gameState, DEFAULT_TIMEOUT);
 	}
 
 
@@ -89,7 +114,7 @@ public class AIClientManager implements Cancellable {
 			throw new IllegalStateException("Already running.");
 
 		cancellationTimer.start();
-		this.cancellationPending = false;
+		cancellationPending = false;
 		running = true;
 	}
 
@@ -104,26 +129,25 @@ public class AIClientManager implements Cancellable {
 	public boolean run(int customDepthLevel) {
 		start();
 
-		treeBuilder.build(customDepthLevel);
-		if (!treeBuilder.isCancellationPending())
-			depthReached += customDepthLevel;
+		boolean res = nodeBuilder.run(customDepthLevel);
 
 		end();
-		return treeBuilder.isCancellationPending();
+		return res;
 	}
 
 
 	public boolean run(DepthLevelSupplier depthLevelSupplier) {
 		start();
+
 		for (int depth : depthLevelSupplier) {
-			treeBuilder.build(depth);
-			if (this.cancellationPending || treeBuilder.isCancellationPending()) {
+			boolean res = nodeBuilder.run(nodeBuilder.getDepthReached() + depth);
+
+			if (!res) {
 				end();
 				return false;
-			} else {
-				this.depthReached += depth;
 			}
 		}
+
 		end();
 		return true;
 	}

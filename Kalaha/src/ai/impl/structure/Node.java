@@ -4,6 +4,7 @@ package ai.impl.structure;
 import ai.impl.UtilityValueManager;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import static ai.impl.UtilityValueManager.NO_VALUE;
 
@@ -11,7 +12,7 @@ import static ai.impl.UtilityValueManager.NO_VALUE;
 
 
 /**
- * A node of the {@link Tree}
+ *
  * Created by Nejc on 23. 09. 2016.
  */
 public class Node {
@@ -19,32 +20,13 @@ public class Node {
 
 
 
-	private static final int CHILDREN_LIST_INITIALIZATION = 6;
-
-
-
-
-	private final Node parent;
-	private final ArrayList<Node> children = new ArrayList<>(CHILDREN_LIST_INITIALIZATION);
 	private final GameMove gameMove;
 	private int utilityValue = NO_VALUE;
+	private int levelsToAdd;
+	private int amboToSelect = -1;
+	public List<Node> children = new ArrayList<>(6);
 
 
-
-
-	public Node getParent() {
-		return parent;
-	}
-
-
-	public boolean hasParent() {
-		return parent != null;
-	}
-
-
-	public ArrayList<Node> getChildren() {
-		return children;
-	}
 
 
 	public int getUtilityValue() {
@@ -87,32 +69,58 @@ public class Node {
 	}
 
 
+	public int getLevelsToAdd() {
+		return levelsToAdd;
+	}
 
 
-	public Node(Node parent, GameMove gameMove) {
-		this.parent = parent;
+	public void setLevelsToAdd(int levelsToAdd) {
+		this.levelsToAdd = levelsToAdd;
+	}
+
+
+	public boolean isLeaf() {
+		return levelsToAdd <= 0 || gameMove.getGameState().gameEnded();
+	}
+
+
+	public boolean canHaveChildren() {
+		return !isLeaf();
+	}
+
+
+	public int getAmboToSelect() {
+		return amboToSelect;
+	}
+
+
+	public void setAmboToSelect(int amboToSelect) {
+		this.amboToSelect = amboToSelect;
+	}
+
+
+
+
+	public Node(GameMove gameMove, int levelsToAdd) {
 		this.gameMove = gameMove;
+		this.levelsToAdd = levelsToAdd;
 	}
 
 
 
 
 	public Node createChild(GameMove gameMove) {
-		Node node = new Node(this, gameMove);
+		Node node = new Node(gameMove, levelsToAdd - 1);
 		this.children.add(node);
 		return node;
 	}
 
 
-	public void remove() {
-		if (this.parent != null)
-			this.parent.children.remove(this);
-	}
 
 
 	@Override
 	public String toString() {
-		return "UtilityValue: " + utilityValue + ", Children: " + children.size() + ", GameMove: { " + gameMove.toString() + " }";
+		return "UtilityValue: " + utilityValue + /*", Children: " + children.size() +*/ ", GameMove: { " + gameMove.toString() + " }";
 	}
 
 
