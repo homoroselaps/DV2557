@@ -1,86 +1,60 @@
 package ai.impl;
 
 
-import ai.impl.structure.GameMove;
 import kalaha.GameState;
 
 
 
 
 /**
- * GameUtility function and value provider.
- * Created by Nejc on 23. 09. 2016.
+ * <p>Handles utility value management.</p>
+ * <p>Created by Nejc on 23. 09. 2016.</p>
  */
 public final class UtilityValueManager {
 
 
+	/**
+	 * Prevent instantiation.
+	 */
 	private UtilityValueManager() {
 	}
 
 
 
 
-	public static final int NO_VALUE = Integer.MIN_VALUE;
-	private static final MinMaxComparator MIN_COMPARATOR = new MinMaxComparator() {
-		@Override
-		public int get(int a, int b) {
-			return Math.min(a, b);
-		}
-	};
-	private static final MinMaxComparator MAX_COMPARATOR = new MinMaxComparator() {
-		@Override
-		public int get(int a, int b) {
-			return Math.max(a, b);
-		}
-	};
+	/**
+	 * A value that represents an undefined utility value.
+	 */
+	public static final int UNDEFINED = Integer.MIN_VALUE;
 
 
 
 
+	/**
+	 * Checks if given utility value is undefined.
+	 *
+	 * @param value Value to check
+	 * @return Whether or not the value is undefined
+	 */
+	public static boolean isUndefined(int value) {
+		return value != UNDEFINED;
+	}
 
 
-
+	/**
+	 * Retrieves a utility value from game state.
+	 *
+	 * @param clientManager Associated {@link AIClientManager}
+	 * @param gameMove      Game move from which the utility value should be extracted
+	 * @return Utility value of given {@link GameMove}
+	 */
 	public static int getUtilityValueFromState(AIClientManager clientManager, GameMove gameMove) {
 		GameState gameState = gameMove.getGameState();
 
 		int valuePlayer = gameState.getScore(clientManager.getMaxPlayer());
 		int valueOpponent = gameState.getScore(clientManager.getMinPlayer());
 
-//		return valuePlayer;
 		return valuePlayer - valueOpponent;
-	}
-
-
-
-
-	public static boolean hasValue(int value) {
-		return value != NO_VALUE;
-	}
-
-
-	public static MinMaxComparator getComparator(boolean player) {
-//		return player
-//				? Math::max
-//				: Math::min;
-		return player
-				? MAX_COMPARATOR
-				: MIN_COMPARATOR;
-	}
-
-
-
-
-
-
-
-
-	//@FunctionalInterface
-	public interface MinMaxComparator {
-
-
-		int get(int a, int b);
-
-
 	}
 
 
