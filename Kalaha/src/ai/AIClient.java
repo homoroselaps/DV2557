@@ -10,6 +10,7 @@ import ai.impl.DepthLevelSupplier;
 import ai.impl.GameUtility;
 import ai.impl.StartArrayDepthLevelSupplier;
 import kalaha.*;
+import ai.impl.LookUpManager;
 
 /**
  * This is the main class for your Kalaha AI bot. Currently
@@ -28,6 +29,8 @@ public class AIClient implements Runnable
     private Socket socket;
     private boolean running;
     private boolean connected;
+    private LookUpManager lookupManger = new LookUpManager();
+    private int moveCount;
     	
     /**
      * Creates a new client.
@@ -49,6 +52,8 @@ public class AIClient implements Runnable
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             addText("Done");
             connected = true;
+            lookupManger.loadFromStringArray(lookupManger.DATA);
+            
         }
         catch (Exception ex)
         {
@@ -216,9 +221,12 @@ public class AIClient implements Runnable
      */
     public int getMove(GameState currentBoard)
     {
-
+        moveCount++;
 	    try {
-
+            
+            if (moveCount == 1 && player == 1) {
+                return lookupManger.getBestMove();
+            }
             AIClientManager clientManager = AIClientManager.create(currentBoard, 4980);
             DepthLevelSupplier depthLevelSupplier = StartArrayDepthLevelSupplier.create(100, 2, 2, 6, 4);
 
