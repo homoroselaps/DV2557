@@ -11,8 +11,15 @@
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
 
-# Project files
-Kalaha/build/**
-Kalaha/dist/**
-Kalaha/nbproject/**
-Kalaha/.idea/**
+# Kalaha project files
+Kalaha/build/**/**
+Kalaha/dist/**/**
+Kalaha/nbproject/**/**
+Kalaha/.idea/**/**
+
+# WumpusWorld project files
+WumpusWorld/.idea/**/**
+WumpusWorld/nbproject/**/**
+WumpusWorld/build/**/**
+WumpusWorld/dist/**/**
+WumpusWorld/out/**/**
