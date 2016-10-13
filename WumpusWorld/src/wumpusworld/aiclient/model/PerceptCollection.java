@@ -38,7 +38,6 @@ public class PerceptCollection implements Cloneable {
 
 
 	private int value;
-	private final Point location;
 	private final Event<PerceptChanged> perceptChangedEvent = new Event<>();
 
 
@@ -49,11 +48,6 @@ public class PerceptCollection implements Cloneable {
 	}
 
 
-	public Point getLocation() {
-		return location;
-	}
-
-
 	public EventInterface<PerceptChanged> getPerceptChangedEvent() {
 		return perceptChangedEvent.getInterface();
 	}
@@ -61,36 +55,32 @@ public class PerceptCollection implements Cloneable {
 
 
 
-	public PerceptCollection(Point location) {
-		Objects.requireNonNull(location);
-
+	public PerceptCollection() {
 		this.value = 0;
-		this.location = location;
 	}
 
 
-	private PerceptCollection(Point location, int value) {
-		this.location = location;
+	private PerceptCollection(int value) {
 		this.value = value;
 	}
 
 
 
 
-	public static PerceptCollection fromWorld(World world, int perceptX, int perceptY, Point collectionLocation) {
+	public static PerceptCollection fromWorld(World world, int x, int y) {
 		Objects.requireNonNull(world);
 
-		PerceptCollection perceptCollection = new PerceptCollection(collectionLocation);
+		PerceptCollection perceptCollection = new PerceptCollection();
 
-		if (world.hasBreeze(perceptX, perceptY))
+		if (world.hasBreeze(x, y))
 			perceptCollection.setBreeze();
-		if (world.hasPit(perceptX, perceptY))
+		if (world.hasPit(x, y))
 			perceptCollection.setPit();
-		if (world.hasStench(perceptX, perceptY))
+		if (world.hasStench(x, y))
 			perceptCollection.setStench();
-		if (world.hasWumpus(perceptX, perceptY))
+		if (world.hasWumpus(x, y))
 			perceptCollection.setWumpus();
-		if (world.hasGlitter(perceptX, perceptY))
+		if (world.hasGlitter(x, y))
 			perceptCollection.setGlitter();
 		if (world.hasGold())
 			perceptCollection.setGold();
@@ -284,7 +274,7 @@ public class PerceptCollection implements Cloneable {
 
 	@Override
 	protected Object clone() throws CloneNotSupportedException {
-		return new PerceptCollection(this.location, this.value);
+		return new PerceptCollection(this.value);
 	}
 
 

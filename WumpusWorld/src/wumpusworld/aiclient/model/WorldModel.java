@@ -59,7 +59,7 @@ public class WorldModel implements Cloneable {
 		for (int i = 0; i < count; i++) {
 			int x = (i % size);
 			int y = (i / size);
-			this.percepts[i] = PerceptCollection.fromWorld(world, x + 1, y + 1, new Point(x, y));
+			this.percepts[i] = PerceptCollection.fromWorld(world, x + 1, y + 1);
 		}
 	}
 
