@@ -57,9 +57,9 @@ public class WorldModel implements Cloneable {
 		int count = size * size;
 		percepts = new PerceptCollection[count];
 		for (int i = 0; i < count; i++) {
-			int x = (i % size) + 1;
-			int y = (i / size) + 1;
-			this.percepts[i] = PerceptCollection.fromWorld(world, x, y);
+			int x = (i % size);
+			int y = (i / size);
+			this.percepts[i] = PerceptCollection.fromWorld(world, x + 1, y + 1, new Point(x, y));
 		}
 	}
 
@@ -74,8 +74,8 @@ public class WorldModel implements Cloneable {
 	}
 
 
-	public boolean isValidPosition(Point point) {
-		return isValidPosition(point.getX(), point.getY());
+	public boolean isValidPosition(Point location) {
+		return isValidPosition(location.getX(), location.getY());
 	}
 
 
@@ -90,8 +90,8 @@ public class WorldModel implements Cloneable {
 	}
 
 
-	protected void requireValidPosition(Point point) {
-		if (!isValidPosition(point))
+	protected void requireValidPosition(Point location) {
+		if (!isValidPosition(location))
 			throw new IndexOutOfBoundsException();
 	}
 
@@ -104,9 +104,9 @@ public class WorldModel implements Cloneable {
 
 
 
-	protected int toIndex(Point point) {
-		requireValidPosition(point);
-		return point.toIndex(getSize());
+	protected int toIndex(Point location) {
+		requireValidPosition(location);
+		return location.toIndex(getSize());
 	}
 
 
@@ -126,15 +126,15 @@ public class WorldModel implements Cloneable {
 
 
 
-	public PerceptCollection getPercepts(Point point) {
-		requireValidPosition(point);
-		return percepts[point.toIndex(getSize())];
+	public PerceptCollection getPercepts(Point location) {
+		requireValidPosition(location);
+		return percepts[location.toIndex(getSize())];
 	}
 
 
-	public Chunk getChunk(Point point) {
-		requireValidPosition(point);
-		return new Chunk(this, point);
+	public Chunk getChunk(Point location) {
+		requireValidPosition(location);
+		return new Chunk(this, location);
 	}
 
 
@@ -156,20 +156,20 @@ public class WorldModel implements Cloneable {
 
 
 
-	public boolean isVisited(Point point) {
-		requireValidPosition(point);
-		return world.isVisited(point.getX() + 1, point.getY() + 1);
+	public boolean isVisited(Point location) {
+		requireValidPosition(location);
+		return world.isVisited(location.getX() + 1, location.getY() + 1);
 	}
 
 
-	public boolean isUnknown(Point point) {
-		return !isVisited(point);
+	public boolean isUnknown(Point location) {
+		return !isVisited(location);
 	}
 
 
-	public boolean hasPlayer(Point point) {
-		Objects.requireNonNull(point);
-		return world.hasPlayer(point.getX() + 1, point.getY() + 1);
+	public boolean hasPlayer(Point location) {
+		Objects.requireNonNull(location);
+		return world.hasPlayer(location.getX() + 1, location.getY() + 1);
 	}
 
 

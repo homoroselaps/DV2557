@@ -18,7 +18,8 @@ public class PerceptChanged {
 
 
 	private final Percept percept;
-	private final TFUValue previousValue;
+	private final TFUValue oldValue;
+	private final TFUValue newValue;
 
 
 
@@ -28,19 +29,26 @@ public class PerceptChanged {
 	}
 
 
-	public TFUValue getPreviousValue() {
-		return previousValue;
+	public TFUValue getOldValue() {
+		return oldValue;
+	}
+
+
+	public TFUValue getNewValue() {
+		return newValue;
 	}
 
 
 
 
-	public PerceptChanged(Percept percept, TFUValue previousValue) {
+	public PerceptChanged(Percept percept, TFUValue newValue, TFUValue oldValue) {
 		Objects.requireNonNull(percept);
-		Objects.requireNonNull(previousValue);
+		Objects.requireNonNull(newValue);
+		Objects.requireNonNull(oldValue);
 
 		this.percept = percept;
-		this.previousValue = previousValue;
+		this.newValue = newValue;
+		this.oldValue = oldValue;
 	}
 
 
