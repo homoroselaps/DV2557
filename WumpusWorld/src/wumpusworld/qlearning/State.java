@@ -1,5 +1,7 @@
 package wumpusworld.qlearning;
 
+import wumpusworld.World;
+
 import java.util.Collection;
 
 /**
@@ -18,6 +20,14 @@ public class State {
         this.direction = direction;
         this.inPit = inPit;
         this.hasArrow = hasArrow;
+    }
+
+    public State(World w){
+        this.x = w.getPlayerX();
+        this.y = w.getPlayerY();
+        this.direction = w.getDirection();
+        this.inPit = w.isInPit();
+        this.hasArrow = w.hasArrow();
     }
 
     public int getX() {

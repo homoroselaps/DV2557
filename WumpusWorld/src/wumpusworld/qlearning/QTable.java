@@ -1,22 +1,29 @@
 package wumpusworld.qlearning;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.function.DoubleSupplier;
 
 /**
  * Created by smarti on 14.10.16.
  */
 public class QTable {
     private HashMap<State, HashMap<Action, Double>> q = new HashMap<>();
+    private DoubleSupplier defaultUtility;
 
     public QTable(){
+        defaultUtility = ()->0;
+    }
 
+    public QTable(double defaultUtility){
+        this.defaultUtility = ()->defaultUtility;
+    }
+
+    public QTable(DoubleSupplier defaultUtility){
+        this.defaultUtility = defaultUtility;
     }
 
     public double getUtility(State state, Action action){
-        double result = 0;
+        double result = defaultUtility.getAsDouble();
         //TODO maybe other default value than 0
         if(!q.containsKey(state)){
             q.put(state, new HashMap<>());
@@ -37,5 +44,4 @@ public class QTable {
         map = q.get(state);
         map.put(action, util);
     }
-
 }
