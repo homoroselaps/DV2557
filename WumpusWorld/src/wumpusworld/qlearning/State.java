@@ -74,4 +74,15 @@ public class State {
         result = 31 * result + (hasArrow ? 1 : 0);
         return result;
     }
+
+    @Override
+    public String toString() {
+        return "State{" +
+                "x=" + x +
+                ", y=" + y +
+                ", direction=" + direction +
+                ", inPit=" + inPit +
+                ", hasArrow=" + hasArrow +
+                '}';
+    }
 }

@@ -1,6 +1,7 @@
 package wumpusworld.qlearning;
 
 import wumpusworld.Agent;
+import wumpusworld.MapReader;
 import wumpusworld.World;
 
 import java.util.Arrays;
@@ -21,11 +22,25 @@ public class LearningAgent implements Agent{
     private State currentState;
     private final double alpha;
     private final double gamma;
-    private BiFunction<World, Action, Double> rewardFinder
-            = (world, action) -> (double) world.getScore() - action.makeAction(world).getScore();
+    private static BiFunction<World, Action, Double> rewardFinder = (world, action) -> {
+        double result = -1;
+        switch (action) {
+            case grabGold:
+                if(world.hasGlitter(world.getPlayerX(), world.getPlayerY())){
+                    result += 1000;
+                }
+                break;
+            case shoot:
+                result -= 10;
+                break;
+        }
+        return result;
+    };
 
     public LearningAgent(World world, QTable q, Random rnd, double alpha, double gamma){
         this.w = world;
+        this.rnd = rnd;
+        this.q = q;
         this.currentState = new State(world);
         this.alpha = alpha;
         this.gamma = gamma;
@@ -48,7 +63,7 @@ public class LearningAgent implements Agent{
     public void doAction() {
         // find best action
         Action action = stream(Action.values())
-                .max(Comparator.comparingDouble(a -> rewardFinder.apply(w,a)))
+                .max(Comparator.comparingDouble(a -> q.getUtility(currentState,a)))
                 .get();
         // update utility value
         World nextWorld = action.makeAction(w);
@@ -61,8 +76,14 @@ public class LearningAgent implements Agent{
                 (rewardFinder.apply(w,action) + gamma * futureUtil - oldUtil);
         q.setUtility(currentState, action, newUtil);
         // do action
+        //System.out.println(currentState + " " +  action.toString() + " " + newUtil);
         w.doAction(action.getCommandName());
         currentState = nextState;
-        w = nextWorld;
+    }
+
+    public static void main(String args[]){
+        World w = new MapReader().readMaps().get(0).generateWorld();
+        stream(Action.values()).map(a -> a.toString() + ": " + rewardFinder.apply(w, a))
+                .forEach(System.out::println);
     }
 }
