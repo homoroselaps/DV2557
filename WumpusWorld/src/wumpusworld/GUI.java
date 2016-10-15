@@ -1,9 +1,13 @@
 package wumpusworld;
 
+import wumpusworld.qlearning.LearningAgent;
+import wumpusworld.qlearning.QTable;
+
 import javax.swing.*;
 import java.awt.event.*;
 import java.awt.*;
 import java.io.File;
+import java.util.Random;
 import java.util.Vector;
 
 /**
@@ -257,14 +261,20 @@ public class GUI implements ActionListener
                 i--;
                 w = maps.get(i).generateWorld();
             }
-            agent = new MyAgent(w);
+            QTable q = new QTable();
+            q.readTable("learnedTable"+(Integer.parseInt(s)-1)+".json");
+            agent = new LearningAgent(w, q, new Random(42), 0.2, 0.5);
+            //agent = new MyAgent(w);
             updateGame();
         }
         if (e.getActionCommand().equals("AGENT"))
         {
             if (agent == null)
             {
-                agent = new MyAgent(w);
+                QTable q = new QTable();
+                q.readTable("learnedTable0.json");
+                agent = new LearningAgent(w, q, new Random(42), 0.2, 0.5);
+                //agent = new MyAgent(w);
             }
             agent.doAction();
             updateGame();
