@@ -3,6 +3,7 @@ package wumpusworld.aiclient.model;
 
 import wumpusworld.World;
 import wumpusworld.aiclient.Action;
+import wumpusworld.aiclient.Direction;
 import wumpusworld.aiclient.util.Event;
 import wumpusworld.aiclient.util.EventInterface;
 
@@ -22,6 +23,7 @@ public class WorldModel implements Cloneable {
 	protected final PerceptCollection[] percepts;
 	private final World world;
 	private final Event<Action> eventAction = new Event<>();
+	private final Event<Chunk> eventChunkExplored = new Event<>();
 
 
 
@@ -31,13 +33,13 @@ public class WorldModel implements Cloneable {
 	}
 
 
-	public int getSize() {
-		return world.getSize();
+	public EventInterface<Action> getActionEvent() {
+		return eventAction.getInterface();
 	}
 
 
-	public EventInterface<Action> getActionEvent() {
-		return eventAction.getInterface();
+	public EventInterface<Chunk> getChunkExploredEvent() {
+		return eventChunkExplored.getInterface();
 	}
 
 
@@ -156,6 +158,53 @@ public class WorldModel implements Cloneable {
 
 
 
+	public boolean doAction(Action action) {
+		boolean res = world.doAction(action.getLegacyAction());
+		boolean canMove = action == Action.MOVE && res;
+		Point newLoc = null;
+
+		if (canMove) {
+			Point loc = getPlayerLocation();
+			int x = loc.getX();
+			int y = loc.getY();
+
+			switch (getPlayerDirection()) {
+				case DOWN:
+					y--;
+				case UP:
+					y++;
+				case LEFT:
+					x--;
+				case RIGHT:
+					x++;
+			}
+			newLoc = new Point(x, y);
+
+			getPercepts(newLoc).copyFrom(PerceptCollection.fromWorld(world, x + 1, y + 1));
+		}
+
+		if (res) {
+			eventAction.invoke(this, action);
+			if (canMove)
+				eventChunkExplored.invoke(this, getChunk(newLoc));
+		}
+
+		return res;
+	}
+
+
+
+
+	public int getSize() {
+		return world.getSize();
+	}
+
+
+	public boolean isGameOver() {
+		return world.gameOver();
+	}
+
+
 	public boolean isVisited(Point location) {
 		requireValidPosition(location);
 		return world.isVisited(location.getX() + 1, location.getY() + 1);
@@ -173,8 +222,13 @@ public class WorldModel implements Cloneable {
 	}
 
 
-	public boolean isInPit() {
-		return world.isInPit();
+	public Point getPlayerLocation() {
+		return new Point(world.getPlayerX(), world.getPlayerY());
+	}
+
+
+	public boolean isWumpusAlive() {
+		return world.wumpusAlive();
 	}
 
 
@@ -183,28 +237,37 @@ public class WorldModel implements Cloneable {
 	}
 
 
-	public boolean wumpusAlive() {
-		return world.wumpusAlive();
-	}
-
-
 	public boolean hasGold() {
 		return world.hasGold();
 	}
 
 
-	public int getDirection() {
-		return world.getDirection();
+	public Direction getPlayerDirection() {
+		return Direction.fromLegacyDirection(world.getDirection());
+	}
+
+
+	public boolean isInPit() {
+		return world.isInPit();
 	}
 
 
 
 
-	public boolean doAction(Action action) {
-		boolean res = world.doAction(action.getLegacyAction());
-		if (res)
-			eventAction.invoke(this, action);
-		return res;
+	public boolean canMove(Direction direction) {
+		Point loc = getPlayerLocation();
+		switch (direction) {
+			case DOWN:
+				return loc.getY() > 0;
+			case UP:
+				return loc.getY() < getSize() - 1;
+			case LEFT:
+				return loc.getX() > 0;
+			case RIGHT:
+				return loc.getX() < getSize() - 1;
+			default:
+				throw new IllegalArgumentException();
+		}
 	}
 
 

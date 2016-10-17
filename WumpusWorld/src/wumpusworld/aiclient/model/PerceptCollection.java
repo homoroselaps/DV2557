@@ -23,18 +23,18 @@ public class PerceptCollection implements Cloneable {
 
 
 
-	private static final int BREEZE_FALSE_BIT   = 1 << 1;
-	private static final int BREEZE_TRUE_BIT    = 1 << 2;
-	private static final int PIT_FALSE_BIT      = 1 << 3;
-	private static final int PIT_TRUE_BIT       = 1 << 4;
-	private static final int STENCH_FALSE_BIT   = 1 << 5;
-	private static final int STENCH_TRUE_BIT    = 1 << 6;
-	private static final int WUMPUS_FALSE_BIT   = 1 << 7;
-	private static final int WUMPUS_TRUE_BIT    = 1 << 8;
-	private static final int GLITTER_FALSE_BIT  = 1 << 9;
-	private static final int GLITTER_TRUE_BIT   = 1 << 10;
-	private static final int GOLD_FALSE_BIT     = 1 << 11;
-	private static final int GOLD_TRUE_BIT      = 1 << 12;
+	private static final int BREEZE_FALSE_BIT = 1 << 1;
+	private static final int BREEZE_TRUE_BIT = 1 << 2;
+	private static final int PIT_FALSE_BIT = 1 << 3;
+	private static final int PIT_TRUE_BIT = 1 << 4;
+	private static final int STENCH_FALSE_BIT = 1 << 5;
+	private static final int STENCH_TRUE_BIT = 1 << 6;
+	private static final int WUMPUS_FALSE_BIT = 1 << 7;
+	private static final int WUMPUS_TRUE_BIT = 1 << 8;
+	private static final int GLITTER_FALSE_BIT = 1 << 9;
+	private static final int GLITTER_TRUE_BIT = 1 << 10;
+	private static final int GOLD_FALSE_BIT = 1 << 11;
+	private static final int GOLD_TRUE_BIT = 1 << 12;
 
 
 	private int value;
@@ -270,6 +270,17 @@ public class PerceptCollection implements Cloneable {
 	}
 
 
+
+	public void copyFrom(PerceptCollection other) {
+		Objects.requireNonNull(other);
+
+		this.setBreeze(other.getBreeze());
+		this.setPit(other.getPit());
+		this.setStench(other.getStench());
+		this.setWumpus(other.getWumpus());
+		this.setGlitter(other.getGlitter());
+		this.setGold(other.getGold());
+	}
 
 
 	@Override

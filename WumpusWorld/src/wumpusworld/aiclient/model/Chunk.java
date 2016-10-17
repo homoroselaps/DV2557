@@ -7,6 +7,7 @@ import wumpusworld.aiclient.util.EventInterface;
 
 import java.util.ArrayList;
 import java.util.Objects;
+import java.util.Optional;
 
 
 
@@ -71,6 +72,29 @@ public class Chunk {
 			adjacent.add(new Chunk(worldModel, point.translate(0, 1)));
 
 		return adjacent.toArray(new Chunk[adjacent.size()]);
+	}
+
+
+	public boolean isAdjacent(Chunk chunk) {
+		Objects.requireNonNull(chunk);
+		int dx = Math.abs(this.point.getX() - chunk.point.getX());
+		int dy = Math.abs(this.point.getY() - chunk.point.getY());
+		return (dx ^ dy) == 1 && (dx | dy) == 1;
+	}
+
+
+	public Optional<Chunk> getOnlyChunkWithSatisfiablePercept(Percept percept) {
+		Objects.requireNonNull(percept);
+
+		Chunk only = null;
+		for (Chunk chunk : getAdjacent()) {
+			if (!chunk.getPercepts().getPercept(percept).isSatisfiable()) {
+				if (only == null) only = chunk;
+				else return Optional.empty();
+			}
+		}
+
+		return Optional.ofNullable(only);
 	}
 
 

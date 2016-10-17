@@ -9,7 +9,7 @@ package wumpusworld.aiclient.util;
 public interface EventHandler<T> {
 
 
-	void onEvent(Object sender, T args);
+	void onEvent(Object sender, T arg);
 
 
 }

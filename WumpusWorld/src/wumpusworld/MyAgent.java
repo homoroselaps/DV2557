@@ -2,6 +2,7 @@ package wumpusworld;
 
 
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
+import wumpusworld.aiclient.assumptionmaking.AssumptionManager;
 import wumpusworld.aiclient.model.WorldModel;
 
 
@@ -26,6 +27,7 @@ public class MyAgent implements Agent {
 	 */
 	public MyAgent(World world) {
 		worldModel = new WorldModel(world);
+		AssumptionManager.getDefault(worldModel).init();
 	}
 
 

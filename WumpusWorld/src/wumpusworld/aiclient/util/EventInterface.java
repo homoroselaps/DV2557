@@ -43,8 +43,13 @@ public class EventInterface<T> {
 	}
 
 
-	public boolean unsubscribe(EventHandler<T> eventHandler) {
+	public boolean unsubscribe(EventHandler<?> eventHandler) {
 		return event.getCallbacks().remove(eventHandler);
+	}
+
+
+	public boolean isSubscribed(EventHandler<T> eventHandler) {
+		return event.getCallbacks().contains(eventHandler);
 	}
 
 
