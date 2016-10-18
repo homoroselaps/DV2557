@@ -4,7 +4,6 @@ package wumpusworld.aiclient.assumptionmaking;
 import wumpusworld.aiclient.model.WorldModel;
 import wumpusworld.aiclient.util.Disposable;
 
-import java.util.Arrays;
 import java.util.Objects;
 
 
@@ -14,14 +13,15 @@ import java.util.Objects;
  * Makes assumptions on a {@link WorldModel}.
  * Created by Nejc on 13. 10. 2016.
  */
-public class AssumptionManager implements AssumptionMaker {
+public class AssumptionManager implements Disposable {
 
 
 
 
 	private final WorldModel worldModel;
-	private AssumptionMaker[] assumptionMakers;
-	private boolean initialized;
+	private final WumpusAssumptionMaker wumpusAssumptionMaker;
+	private final PitAssumptionMaker pitAssumptionMaker;
+	private final GoldAssumptionMaker goldAssumptionMaker;
 
 
 
@@ -31,71 +31,63 @@ public class AssumptionManager implements AssumptionMaker {
 	}
 
 
-	public boolean isInitialized() {
-		return initialized;
+	public WumpusAssumptionMaker getWumpusAssumptionMaker() {
+		return wumpusAssumptionMaker;
 	}
 
 
-	@Override
-	public boolean isDone() {
-		return Arrays.stream(assumptionMakers)
-				.allMatch(AssumptionMaker::isDone);
+	public PitAssumptionMaker getPitAssumptionMaker() {
+		return pitAssumptionMaker;
+	}
+
+
+	public GoldAssumptionMaker getGoldAssumptionMaker() {
+		return goldAssumptionMaker;
 	}
 
 
 
 
-	public AssumptionManager(WorldModel worldModel, AssumptionMaker[] assumptionMakers) {
+	public AssumptionManager(WorldModel worldModel) {
 		Objects.requireNonNull(worldModel);
-		Objects.requireNonNull(assumptionMakers);
-
-		for (AssumptionMaker assumptionMaker : assumptionMakers) {
-			if (assumptionMaker == null)
-				throw new IllegalArgumentException();
-		}
 
 		this.worldModel = worldModel;
-		this.assumptionMakers = assumptionMakers.clone();
+		this.wumpusAssumptionMaker = new WumpusAssumptionMaker(worldModel);
+		this.pitAssumptionMaker = new PitAssumptionMaker(worldModel);
+		this.goldAssumptionMaker = new GoldAssumptionMaker(worldModel);
 	}
 
 
 
 
-	public static AssumptionManager getDefault(WorldModel worldModel) {
-		Objects.requireNonNull(worldModel);
-
-		return new AssumptionManager(worldModel, new AssumptionMaker[]{
-				new WumpusAssumptionMaker(worldModel),
-				new PitAssumptionMaker(worldModel),
-				new GoldAssumptionMaker(worldModel)
-		});
+	public boolean allDone() {
+		return wumpusAssumptionMaker.isDone()
+				&& pitAssumptionMaker.isDone()
+				&& goldAssumptionMaker.isDone();
 	}
 
 
-
-
-	@Override
-	public void init() {
-		if (initialized)
-			throw new IllegalStateException("Already initialized.");
-		initialized = true;
-
-		Arrays.stream(assumptionMakers)
-				.forEach(AssumptionMaker::init);
+	public void initAll() {
+		wumpusAssumptionMaker.init();
+		pitAssumptionMaker.init();
+		goldAssumptionMaker.init();
 	}
 
 
-	@Override
 	public void updateAll() {
-		Arrays.stream(assumptionMakers)
-				.forEach(AssumptionMaker::updateAll);
+		wumpusAssumptionMaker.updateAll();
+		pitAssumptionMaker.updateAll();
+		goldAssumptionMaker.updateAll();
 	}
+
+
 
 
 	@Override
 	public void dispose() {
-		Arrays.stream(assumptionMakers)
-				.forEach(Disposable::dispose);
+		wumpusAssumptionMaker.dispose();
+		pitAssumptionMaker.dispose();
+		goldAssumptionMaker.dispose();
 	}
 
 

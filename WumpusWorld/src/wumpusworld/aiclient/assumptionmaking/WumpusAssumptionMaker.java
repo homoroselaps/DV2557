@@ -4,7 +4,6 @@ package wumpusworld.aiclient.assumptionmaking;
 import wumpusworld.aiclient.Action;
 import wumpusworld.aiclient.model.Chunk;
 import wumpusworld.aiclient.model.PerceptChanged;
-import wumpusworld.aiclient.model.PerceptCollection;
 import wumpusworld.aiclient.model.WorldModel;
 import wumpusworld.aiclient.util.EventHandler;
 import wumpusworld.aiclient.util.EventInterface;
@@ -12,8 +11,6 @@ import wumpusworld.aiclient.util.EventInterface;
 import java.util.*;
 
 import static wumpusworld.aiclient.Action.SHOOT;
-import static wumpusworld.aiclient.Percept.PIT;
-import static wumpusworld.aiclient.Percept.STENCH;
 import static wumpusworld.aiclient.Percept.WUMPUS;
 import static wumpusworld.aiclient.model.TFUValue.FALSE;
 import static wumpusworld.aiclient.model.TFUValue.TRUE;
@@ -22,6 +19,7 @@ import static wumpusworld.aiclient.model.TFUValue.TRUE;
 
 
 /**
+ * Makes assumptions on where Wumpus is located.
  * Created by Nejc on 14. 10. 2016.
  */
 public class WumpusAssumptionMaker implements AssumptionMaker {
@@ -97,31 +95,16 @@ public class WumpusAssumptionMaker implements AssumptionMaker {
 		Chunk[] chunks = worldModel.getChunks();
 		listeners = new HashMap<>(2 + chunks.length);
 
-		EventHandler<Action> actionEventHandler = new EventHandler<Action>() {
-			@Override
-			public void onEvent(Object sender, Action arg) {
-				onAction(arg);
-			}
-		};
+		EventHandler<Action> actionEventHandler = (sender, arg) -> onAction(arg);
 		worldModel.getActionEvent().subscribe(actionEventHandler);
 		listeners.put(actionEventHandler, worldModel.getActionEvent());
 
-		EventHandler<Chunk> chunkExploredEventHandler = new EventHandler<Chunk>() {
-			@Override
-			public void onEvent(Object sender, Chunk arg) {
-				onChunkExplored(arg);
-			}
-		};
+		EventHandler<Chunk> chunkExploredEventHandler = (sender, arg) -> onChunkExplored(arg);
 		worldModel.getChunkExploredEvent().subscribe(chunkExploredEventHandler);
 		listeners.put(chunkExploredEventHandler, worldModel.getChunkExploredEvent());
 
 		for (final Chunk chunk : worldModel.getChunks()) {
-			EventHandler<PerceptChanged> perceptChangedEventHandler = new EventHandler<PerceptChanged>() {
-				@Override
-				public void onEvent(Object sender, PerceptChanged arg) {
-					onPerceptChanged(chunk, arg);
-				}
-			};
+			EventHandler<PerceptChanged> perceptChangedEventHandler = (sender, arg) -> onPerceptChanged(chunk, arg);
 			chunk.getPercepts().getPerceptChangedEvent().subscribe(perceptChangedEventHandler);
 		}
 	}
@@ -159,7 +142,7 @@ public class WumpusAssumptionMaker implements AssumptionMaker {
 		invokeChunkWithNoStenchDiscovered(chunk);
 		invokeChunkWithStenchDiscovered(chunk);
 		invokeChunkWithStenchHasOnlyOneAdjacentChunkWithWumpusLeft(chunk, true);
-		invokeOnlyOneChunkWithWumpusRemaining(chunk);
+		invokeOnlyOneChunkWithWumpusRemaining();
 	}
 
 
@@ -167,14 +150,7 @@ public class WumpusAssumptionMaker implements AssumptionMaker {
 		if (done) return;
 
 		if (perceptChanged.getPercept() == WUMPUS) {
-			if (perceptChanged.getNewValue() == TRUE) {
-				onWumpusLocated(chunk);
-			}
-		} else if (perceptChanged.getPercept() == STENCH) {
-
-
-
-
+			invokeWumpusLocated(chunk);
 		}
 	}
 
@@ -219,19 +195,7 @@ public class WumpusAssumptionMaker implements AssumptionMaker {
 
 
 	private void initOnlyOneChunkWithWumpusRemaining() {
-		Chunk[] chunks = worldModel.getChunks();
-
-		chunksWithNoWumpus = (int) Arrays.stream(chunks)
-				.filter(chunk -> chunk.getPercepts().getWumpus() == FALSE)
-				.count();
-
-		if (chunksWithNoWumpus == 1)
-			invokeOnlyOneChunkWithWumpusRemaining(
-					Arrays.stream(chunks)
-							.filter(chunk -> chunk.getPercepts().getWumpus().isSatisfiable())
-							.findFirst()
-							.get()
-			);
+		invokeOnlyOneChunkWithWumpusRemaining();
 	}
 
 
@@ -266,15 +230,17 @@ public class WumpusAssumptionMaker implements AssumptionMaker {
 
 
 	private void invokeChunkWithStenchHasOnlyOneAdjacentChunkWithWumpusLeft(Chunk chunk, boolean subscribe) {
-		Optional<Chunk> theOnlyOne = chunk.getOnlyChunkWithSatisfiablePercept(PIT);
+		if (chunk.getPercepts().getStench() != TRUE) return;
+
+		Optional<Chunk> theOnlyOne = chunk.getOnlyChunkWithSatisfiablePercept(WUMPUS);
 		if (theOnlyOne.isPresent()) {
 			onChunkWithStenchHasOnlyOneAdjacentChunkWithWumpusLeft(chunk, theOnlyOne.get());
 		} else if (subscribe) {
 			Arrays.stream(chunk.getAdjacent())
-					.filter(c -> c.getPercepts().getBreeze().isSatisfiable())
+					.filter(c -> c.getPercepts().getStench().isSatisfiable())
 					.forEach(c -> {
 						EventHandler<PerceptChanged> perceptChangedEventHandler = (sender, arg) -> {
-							if (arg.getPercept() == PIT && arg.getNewValue() == FALSE)
+							if (arg.getPercept() == WUMPUS && arg.getNewValue() == FALSE)
 								invokeChunkWithStenchHasOnlyOneAdjacentChunkWithWumpusLeft(chunk, false);
 						};
 						c.getPercepts().getPerceptChangedEvent().subscribe(perceptChangedEventHandler);
@@ -284,16 +250,18 @@ public class WumpusAssumptionMaker implements AssumptionMaker {
 	}
 
 
-	private void invokeOnlyOneChunkWithWumpusRemaining(Chunk chunk) {
-		if (chunk.getPercepts().getWumpus() != FALSE) return;
-
-		if (--chunksWithNoWumpus == 1) {
-			Arrays.stream(worldModel.getChunks())
-					.filter(c -> c.getPercepts().getWumpus().isSatisfiable())
-					.findFirst()
-					.get();
-
+	private void invokeOnlyOneChunkWithWumpusRemaining() {
+		Chunk onlyWithWumpus = null;
+		for (Chunk chunk : worldModel.getChunks()) {
+			if (chunk.getPercepts().getWumpus().isSatisfiable()) {
+				if (onlyWithWumpus == null)
+					onlyWithWumpus = chunk;
+				else return;
+			}
 		}
+
+		if (onlyWithWumpus != null)
+			onOnlyOneChunkWithWumpusRemaining(onlyWithWumpus);
 	}
 
 

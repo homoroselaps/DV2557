@@ -46,10 +46,12 @@ public class Event<T> {
 
 
 	public void invoke(Object sender, T args) {
-		for (EventHandler<T> callback : callbacks) {
-			if (callback != null)
-				callback.onEvent(sender, args);
-		}
+		EventHandler<T>[] eventHandlers = new EventHandler[callbacks.size()]; // create a clone
+		callbacks.toArray(eventHandlers);
+
+		for (EventHandler<T> eventHandler : eventHandlers)
+			if (eventHandler != null)
+				eventHandler.onEvent(sender, args);
 	}
 
 

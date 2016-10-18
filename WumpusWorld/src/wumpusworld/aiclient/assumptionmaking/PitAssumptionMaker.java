@@ -15,12 +15,13 @@ import java.util.Optional;
 import static wumpusworld.aiclient.Percept.PIT;
 import static wumpusworld.aiclient.model.TFUValue.FALSE;
 import static wumpusworld.aiclient.model.TFUValue.TRUE;
+import static wumpusworld.aiclient.model.TFUValue.UNKNOWN;
 
 
 
 
 /**
- * Logic for handling where pits may be located.
+ * Makes assumptions on where pits may be located.
  * Created by Nejc on 17. 10. 2016.
  */
 public class PitAssumptionMaker implements AssumptionMaker {
@@ -29,8 +30,8 @@ public class PitAssumptionMaker implements AssumptionMaker {
 
 
 	private final WorldModel worldModel;
-	private boolean done;
 	private HashMap<EventHandler<?>, EventInterface<?>> listeners;
+	private boolean done;
 
 
 
@@ -97,14 +98,9 @@ public class PitAssumptionMaker implements AssumptionMaker {
 	}
 
 
-	private void onPreDone() {
-		unsubscribe();
-	}
-
-
-	private void onDone() {
-		unsubscribe();
-		done = true;
+	private void checkDone() {
+		done = Arrays.stream(worldModel.getChunks())
+				.allMatch(chunk -> chunk.getPercepts().getPit() != UNKNOWN);
 	}
 
 
@@ -141,9 +137,11 @@ public class PitAssumptionMaker implements AssumptionMaker {
 
 
 	private void invokeChunkWithBreezeHasOnlyOneAdjacentChunkWithPit(Chunk chunk, boolean subscribe) {
+		if (chunk.getPercepts().getBreeze() != TRUE) return;
+
 		Optional<Chunk> theOnlyOne = chunk.getOnlyChunkWithSatisfiablePercept(PIT);
 		if (theOnlyOne.isPresent()) {
-			onChunkWithBreezeHasOnlyOneAdjacentChunkWithPit(chunk, theOnlyOne.get());
+			onChunkWithBreezeHasOnlyOneAdjacentChunkWithPit(theOnlyOne.get());
 		} else if (subscribe) {
 			Arrays.stream(chunk.getAdjacent())
 					.filter(c -> c.getPercepts().getBreeze().isSatisfiable())
@@ -164,12 +162,13 @@ public class PitAssumptionMaker implements AssumptionMaker {
 	private void onChunkWithNoBreezeDiscovered(Chunk chunk) {
 		Arrays.stream(chunk.getAdjacent())
 				.forEach(c -> c.getPercepts().setPit(FALSE));
+		checkDone();
 	}
 
 
-	private void onChunkWithBreezeHasOnlyOneAdjacentChunkWithPit(Chunk chunk, Chunk adjacentChunk) {
+	private void onChunkWithBreezeHasOnlyOneAdjacentChunkWithPit(Chunk adjacentChunk) {
 		adjacentChunk.getPercepts().setPit();
-
+		checkDone();
 	}
 
 

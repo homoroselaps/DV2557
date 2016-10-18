@@ -2,8 +2,6 @@ package wumpusworld.aiclient.model;
 
 
 import wumpusworld.aiclient.Percept;
-import wumpusworld.aiclient.util.Event;
-import wumpusworld.aiclient.util.EventInterface;
 
 import java.util.ArrayList;
 import java.util.Objects;
@@ -88,7 +86,7 @@ public class Chunk {
 
 		Chunk only = null;
 		for (Chunk chunk : getAdjacent()) {
-			if (!chunk.getPercepts().getPercept(percept).isSatisfiable()) {
+			if (chunk.getPercepts().getPercept(percept).isSatisfiable()) {
 				if (only == null) only = chunk;
 				else return Optional.empty();
 			}

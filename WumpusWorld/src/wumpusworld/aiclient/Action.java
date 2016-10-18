@@ -13,12 +13,12 @@ import wumpusworld.World;
 public enum Action {
 
 
-	MOVE(World.A_MOVE),
-	GRAB(World.A_GRAB),
-	CLIMB(World.A_CLIMB),
-	SHOOT(World.A_SHOOT),
-	TURN_LEFT(World.A_TURN_LEFT),
-	TURN_RIGHT(World.A_TURN_RIGHT);
+	MOVE        (World.A_MOVE),
+	GRAB        (World.A_GRAB),
+	CLIMB       (World.A_CLIMB),
+	SHOOT       (World.A_SHOOT),
+	TURN_LEFT   (World.A_TURN_LEFT),
+	TURN_RIGHT  (World.A_TURN_RIGHT);
 
 
 	private final String legacyAction;

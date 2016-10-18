@@ -5,7 +5,6 @@ import wumpusworld.aiclient.model.Chunk;
 import wumpusworld.aiclient.model.WorldModel;
 import wumpusworld.aiclient.util.EventHandler;
 
-import java.security.KeyStore;
 import java.util.Arrays;
 import java.util.Objects;
 
@@ -16,6 +15,7 @@ import static wumpusworld.aiclient.model.TFUValue.*;
 
 
 /**
+ * Makes assumptions on where gold is located.
  * Created by Nejc on 17. 10. 2016.
  */
 public class GoldAssumptionMaker implements AssumptionMaker {

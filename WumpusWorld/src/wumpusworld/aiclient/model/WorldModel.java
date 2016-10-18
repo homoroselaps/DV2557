@@ -120,7 +120,7 @@ public class WorldModel implements Cloneable {
 
 	protected Point toPoint(int index) {
 		requireValidPosition(index);
-		int x = index & getSize();
+		int x = index % getSize();
 		int y = index / getSize();
 		return new Point(x, y);
 	}
@@ -164,23 +164,8 @@ public class WorldModel implements Cloneable {
 		Point newLoc = null;
 
 		if (canMove) {
-			Point loc = getPlayerLocation();
-			int x = loc.getX();
-			int y = loc.getY();
-
-			switch (getPlayerDirection()) {
-				case DOWN:
-					y--;
-				case UP:
-					y++;
-				case LEFT:
-					x--;
-				case RIGHT:
-					x++;
-			}
-			newLoc = new Point(x, y);
-
-			getPercepts(newLoc).copyFrom(PerceptCollection.fromWorld(world, x + 1, y + 1));
+			newLoc = getPlayerLocation();
+			getPercepts(newLoc).copyFrom(PerceptCollection.fromWorld(world, newLoc.getX() + 1, newLoc.getY() + 1));
 		}
 
 		if (res) {
@@ -223,7 +208,7 @@ public class WorldModel implements Cloneable {
 
 
 	public Point getPlayerLocation() {
-		return new Point(world.getPlayerX(), world.getPlayerY());
+		return new Point(world.getPlayerX() - 1, world.getPlayerY() - 1);
 	}
 
 

@@ -23,18 +23,18 @@ public class PerceptCollection implements Cloneable {
 
 
 
-	private static final int BREEZE_FALSE_BIT = 1 << 1;
-	private static final int BREEZE_TRUE_BIT = 1 << 2;
-	private static final int PIT_FALSE_BIT = 1 << 3;
-	private static final int PIT_TRUE_BIT = 1 << 4;
-	private static final int STENCH_FALSE_BIT = 1 << 5;
-	private static final int STENCH_TRUE_BIT = 1 << 6;
-	private static final int WUMPUS_FALSE_BIT = 1 << 7;
-	private static final int WUMPUS_TRUE_BIT = 1 << 8;
-	private static final int GLITTER_FALSE_BIT = 1 << 9;
-	private static final int GLITTER_TRUE_BIT = 1 << 10;
-	private static final int GOLD_FALSE_BIT = 1 << 11;
-	private static final int GOLD_TRUE_BIT = 1 << 12;
+	private static final int BREEZE_FALSE_BIT   = 1;
+	private static final int BREEZE_TRUE_BIT    = 1 << 1;
+	private static final int PIT_FALSE_BIT      = 1 << 2;
+	private static final int PIT_TRUE_BIT       = 1 << 3;
+	private static final int STENCH_FALSE_BIT   = 1 << 4;
+	private static final int STENCH_TRUE_BIT    = 1 << 5;
+	private static final int WUMPUS_FALSE_BIT   = 1 << 6;
+	private static final int WUMPUS_TRUE_BIT    = 1 << 7;
+	private static final int GLITTER_FALSE_BIT  = 1 << 8;
+	private static final int GLITTER_TRUE_BIT   = 1 << 9;
+	private static final int GOLD_FALSE_BIT     = 1 << 10;
+	private static final int GOLD_TRUE_BIT      = 1 << 11;
 
 
 	private int value;
@@ -72,18 +72,14 @@ public class PerceptCollection implements Cloneable {
 
 		PerceptCollection perceptCollection = new PerceptCollection();
 
-		if (world.hasBreeze(x, y))
-			perceptCollection.setBreeze();
-		if (world.hasPit(x, y))
-			perceptCollection.setPit();
-		if (world.hasStench(x, y))
-			perceptCollection.setStench();
-		if (world.hasWumpus(x, y))
-			perceptCollection.setWumpus();
-		if (world.hasGlitter(x, y))
-			perceptCollection.setGlitter();
-		if (world.hasGold())
-			perceptCollection.setGold();
+		if (world.isVisited(x, y)) {
+			perceptCollection.setBreeze(fromValue(world.hasBreeze(x, y)));
+			perceptCollection.setPit(fromValue(world.hasPit(x, y)));
+			perceptCollection.setStench(fromValue(world.hasStench(x, y)));
+			perceptCollection.setWumpus(fromValue(world.hasWumpus(x, y)));
+			perceptCollection.setGlitter(fromValue(world.hasGlitter(x, y)));
+//			perceptCollection.setGold(fromValue(world.hasGlitter(x, y)));
+		} // otherwise everything is UNKNOWN
 
 		return perceptCollection;
 	}
@@ -92,13 +88,28 @@ public class PerceptCollection implements Cloneable {
 
 
 	private static int getPerceptFalseBitCode(Percept percept) {
-		return (percept.ordinal() * 2) + 1;
+		return 1 << (percept.ordinal() * 2);
 	}
 
 
 	private static Percept getPerceptFromFalseBitCode(int perceptFalseBitCode) {
-		int ordinal = (perceptFalseBitCode - 1) / 2;
-		return Percept.values()[ordinal];
+		if (perceptFalseBitCode == 0)
+			throw new IllegalArgumentException();
+
+		int i = 0;
+		for (; i < 12; i++) {
+			if (perceptFalseBitCode == 1)
+				break;
+			perceptFalseBitCode >>= 1;
+		}
+
+		int ordinal = i / 2;
+
+		Percept[] values = Percept.values();
+		if (ordinal >= values.length)
+			throw new IllegalArgumentException();
+
+		return values[ordinal];
 	}
 
 
@@ -120,11 +131,14 @@ public class PerceptCollection implements Cloneable {
 			case FALSE:
 				value |= falseBit;
 				value &= ~trueBit;
+				break;
 			case TRUE:
 				value |= trueBit;
 				value &= ~falseBit;
+				break;
 			case UNKNOWN:
 				value &= ~(falseBit | trueBit);
+				break;
 		}
 
 		return value;
@@ -287,6 +301,8 @@ public class PerceptCollection implements Cloneable {
 	protected Object clone() throws CloneNotSupportedException {
 		return new PerceptCollection(this.value);
 	}
+
+
 
 
 	@Override

@@ -18,6 +18,7 @@ public class MyAgent implements Agent {
 
 
 	private final WorldModel worldModel;
+	private final AssumptionManager assumptionManager;
 
 
 	/**
@@ -26,8 +27,9 @@ public class MyAgent implements Agent {
 	 * @param world Current world state
 	 */
 	public MyAgent(World world) {
-		worldModel = new WorldModel(world);
-		AssumptionManager.getDefault(worldModel).init();
+		this.worldModel = new WorldModel(world);
+		this.assumptionManager = new AssumptionManager(this.worldModel);
+		this.assumptionManager.initAll();
 	}
 
 

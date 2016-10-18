@@ -13,12 +13,12 @@ import wumpusworld.World;
 public enum Percept {
 
 
-	BREEZE(World.BREEZE),
-	PIT(World.PIT),
-	STENCH(World.STENCH),
-	WUMPUS(World.WUMPUS),
-	GLITTER(World.GLITTER),
-	GOLD(World.GOLD);
+	BREEZE  (World.BREEZE),
+	PIT     (World.PIT),
+	STENCH  (World.STENCH),
+	WUMPUS  (World.WUMPUS),
+	GLITTER (World.GLITTER),
+	GOLD    (World.GOLD);
 
 
 	private final String legacyPercept;
