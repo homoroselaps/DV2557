@@ -261,7 +261,7 @@ public class GUI implements ActionListener
                 i--;
                 w = maps.get(i).generateWorld();
             }
-            QTable q = new QTable();
+            QTable<Double> q = new QTable<>(0.0);
             q.readTable("learnedTable"+(Integer.parseInt(s)-1)+".json");
             agent = new LearningAgent(w, q, new Random(42), 0.2, 0.5);
             //agent = new MyAgent(w);
@@ -271,7 +271,8 @@ public class GUI implements ActionListener
         {
             if (agent == null)
             {
-                QTable q = new QTable();
+                QTable<Double> q = new QTable<>(0.0);
+                //q.readTable("learnedTable0.json");
                 q.readTable("learnedTable0.json");
                 agent = new LearningAgent(w, q, new Random(42), 0.2, 0.5);
                 //agent = new MyAgent(w);

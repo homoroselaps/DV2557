@@ -9,7 +9,7 @@ import java.util.Vector;
  * 
  * @author Johan Hagelbäck
  */
-public class World 
+public class World implements Cloneable
 {
     private int size;
     private String[][] w;
@@ -597,5 +597,16 @@ public class World
         }
         
         return true;    
+    }
+
+    @Override
+    public World clone() throws CloneNotSupportedException {
+        World other = cloneWorld();
+        other.score = this.score;
+        other.hasGold = this.hasGold;
+        other.hasArrow = this.hasArrow;
+        other.isInPit = this.isInPit;
+        other.wumpusAlive = this.wumpusAlive;
+        return other;
     }
 }

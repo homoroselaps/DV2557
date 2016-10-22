@@ -1,13 +1,5 @@
 package wumpusworld.qlearning;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.JsonDeserializer;
-import com.fasterxml.jackson.databind.KeyDeserializer;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-
-import java.io.IOException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -23,18 +15,19 @@ public class QKey {
      * @param json
      */
     public QKey(String json){
-        Pattern p = Pattern.compile("QKey\\{state=State\\{x=(\\d+),\\sy=(\\d+)," +
-                "\\sdirection=(\\d+),\\sinPit=(false|true),\\shasArrow=(false|true)\\}," +
-                "\\saction=(\\w+)\\}");
+        Pattern p = Pattern.compile("QKey\\{state=State\\{x=(\\d+),\\sy=(\\d+),\\sdirection=(\\d+)," +
+                "\\swumpusAlive=(false|true),\\sinPit=(false|true)," +
+                "\\shasArrow=(false|true)\\},\\saction=(\\w+)\\}");
         Matcher m = p.matcher(json);
         if(m.matches()){
             int x = Integer.parseInt(m.group(1));
             int y = Integer.parseInt(m.group(2));
             int dir = Integer.parseInt(m.group(3));
-            boolean inPit = Boolean.parseBoolean(m.group(4));
-            boolean hasArrow = Boolean.parseBoolean(m.group(5));
-            this.state = new State(x,y,dir,inPit,hasArrow);
-            this.action = Action.valueOf(m.group(6));
+            boolean wumpusAlive = Boolean.parseBoolean(m.group(4));
+            boolean inPit = Boolean.parseBoolean(m.group(5));
+            boolean hasArrow = Boolean.parseBoolean(m.group(6));
+            this.state = new State(x,y,dir, wumpusAlive, inPit,hasArrow);
+            this.action = Action.valueOf(m.group(7));
         } else {
             throw new IllegalArgumentException("json could not be parsed");
         }

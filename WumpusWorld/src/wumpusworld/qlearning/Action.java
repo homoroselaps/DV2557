@@ -9,10 +9,15 @@ import wumpusworld.World;
  * Created by smarti on 14.10.16.
  */
 public enum Action {
-    turnLeft, turnRight, walk, shoot, climb, grabGold;
+    grabGold, shoot, climb, turnLeft, turnRight, move;
 
     public World makeAction(World world){
-        World result = world.cloneWorld();
+        World result = null;
+        try {
+            result = world.clone();
+        } catch (CloneNotSupportedException e) {
+            throw new RuntimeException();
+        }
         result.doAction(getCommandName());
         return result;
     }
@@ -26,7 +31,7 @@ public enum Action {
             case turnRight:
                 result = World.A_TURN_RIGHT;
                 break;
-            case walk:
+            case move:
                 result = World.A_MOVE;
                 break;
             case shoot:

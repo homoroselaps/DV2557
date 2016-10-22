@@ -10,23 +10,20 @@ import java.io.File;
 import java.io.IOException;
 import java.util.*;
 import java.util.function.DoubleSupplier;
+import java.util.function.Supplier;
 
 /**
  * Created by smarti on 14.10.16.
  */
-public class QTable {
-    private HashMap<QKey, Double> q = new HashMap<>();
-    private DoubleSupplier defaultUtility;
+public class QTable<T> {
+    private HashMap<QKey, T> q = new HashMap<>();
+    private Supplier<T> defaultUtility;
 
-    public QTable(){
-        defaultUtility = ()->0;
-    }
-
-    public QTable(double defaultUtility){
+    public QTable(T defaultUtility){
         this.defaultUtility = ()->defaultUtility;
     }
 
-    public QTable(DoubleSupplier defaultUtility){
+    public QTable(Supplier<T> defaultUtility){
         this.defaultUtility = defaultUtility;
     }
 
@@ -51,8 +48,8 @@ public class QTable {
         }
     }
 
-    public double getUtility(State state, Action action){
-        double result = defaultUtility.getAsDouble();
+    public T getValue(State state, Action action){
+        T result = defaultUtility.get();
         //TODO maybe other default value than 0
         if(q.containsKey(new QKey(state,action))){
             result = q.get(new QKey(state,action));
@@ -60,7 +57,7 @@ public class QTable {
         return result;
     }
 
-    public void setUtility(State state, Action action, double util){
+    public void setValue(State state, Action action, T util){
         q.put(new QKey(state, action), util);
     }
 
