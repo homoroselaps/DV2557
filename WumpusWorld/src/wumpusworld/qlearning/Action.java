@@ -9,7 +9,7 @@ import wumpusworld.World;
  * Created by smarti on 14.10.16.
  */
 public enum Action {
-    grabGold, shoot, climb, turnLeft, turnRight, move;
+    grabGold, climb, shoot, turnLeft, turnRight, move;
 
     public World makeAction(World world){
         World result = null;

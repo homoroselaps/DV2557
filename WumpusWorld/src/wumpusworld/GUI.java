@@ -263,7 +263,7 @@ public class GUI implements ActionListener
             }
             QTable<Double> q = new QTable<>(0.0);
             q.readTable("learnedTable"+(Integer.parseInt(s)-1)+".json");
-            agent = new LearningAgent(w, q, new Random(42), 0.2, 0.5);
+            agent = new LearningAgent(w, q, new Random(42), 0.2, 0.5, 0.0, 0);
             //agent = new MyAgent(w);
             updateGame();
         }
@@ -274,7 +274,7 @@ public class GUI implements ActionListener
                 QTable<Double> q = new QTable<>(0.0);
                 //q.readTable("learnedTable0.json");
                 q.readTable("learnedTable0.json");
-                agent = new LearningAgent(w, q, new Random(42), 0.2, 0.5);
+                agent = new LearningAgent(w, q, new Random(42), 0.2, 0.5, 0.0, 0);
                 //agent = new MyAgent(w);
             }
             agent.doAction();
