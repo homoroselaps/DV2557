@@ -107,14 +107,63 @@ public class TestingMain {
 		init("assumption making", new World(4))
 				.clone("cloneWorld")
 				.test(world -> {
-					world.addWumpus(1, 1);
-					WorldModel worldModel = new WorldModel(world);
-					init("Wumpus assumption maker", new WumpusAssumptionMaker(worldModel))
-							.test(wumpusAssumptionMaker -> {
+					world.addWumpus(2, 2);
+					init("Wumpus assumption maker", new WorldModel(world))
+							.clone()
+							.test(worldModel -> {
+								WumpusAssumptionMaker wumpusAssumptionMaker = new WumpusAssumptionMaker(worldModel);
 								wumpusAssumptionMaker.init();
+								it("should not locate wumpus")
+										.expect(wumpusAssumptionMaker.isWumpusLocated())
+										.toEqual(false);
+								it("should not be done")
+										.expect(wumpusAssumptionMaker.isDone())
+										.toEqual(false);
+								worldModel.doAction(MOVE);
+								worldModel.doAction(TURN_RIGHT);
+								worldModel.doAction(TURN_RIGHT);
+								worldModel.doAction(MOVE);
+								worldModel.doAction(TURN_RIGHT);
+								worldModel.doAction(MOVE);
+								it("should locate wumpus")
+										.expect(wumpusAssumptionMaker.isWumpusLocated())
+										.toEqual(true);
+								it("should not be done")
+										.expect(wumpusAssumptionMaker.isDone())
+										.toEqual(false);
+								worldModel.doAction(TURN_RIGHT);
+								worldModel.doAction(SHOOT);
 								it("should be done")
 										.expect(wumpusAssumptionMaker.isDone())
 										.toEqual(true);
+							})
+							.test(worldModel -> {
+								WumpusAssumptionMaker wumpusAssumptionMaker = new WumpusAssumptionMaker(worldModel);
+								wumpusAssumptionMaker.init();
+								worldModel.doAction(MOVE);
+								worldModel.doAction(TURN_RIGHT);
+								worldModel.doAction(TURN_RIGHT);
+								worldModel.doAction(MOVE);
+								worldModel.doAction(SHOOT);
+								worldModel.doAction(TURN_RIGHT);
+								it("should not be done")
+										.expect(wumpusAssumptionMaker.isDone())
+										.toEqual(false);
+								worldModel.doAction(MOVE);
+								it("should be done")
+										.expect(wumpusAssumptionMaker.isDone())
+										.toEqual(true);
+							});
+				})
+				.test(world -> {
+					world.addWumpus(3, 3);
+					init("Aw0: Arrow has been shoot through a cell", new WorldModel(world))
+							.test(worldModel -> {
+								new AssumptionManager(worldModel).initAll();
+								worldModel.doAction(SHOOT);
+								it("should detect Wumpus' absence")
+										.expect(worldModel.getChunk(new Point(2, 0)).getPercepts().getWumpus())
+										.toEqual(FALSE);
 							});
 				})
 				.test(world -> {
@@ -165,7 +214,7 @@ public class TestingMain {
 							.test(worldModel -> {
 								new AssumptionManager(worldModel).initAll();
 								worldModel.doAction(MOVE);
-								it("should detect Wumpus's absence")
+								it("should detect Wumpus' absence")
 										.expect(worldModel.getChunk(new Point(0, 1)).getPercepts().getWumpus())
 										.toEqual(FALSE);
 							});
@@ -205,7 +254,7 @@ public class TestingMain {
 				})
 				.test(world -> {
 					world.addWumpus(2, 3);
-					init("Aw combination", new WorldModel(world))
+					init("Aw: combination", new WorldModel(world))
 							.test(worldModel -> {
 								new AssumptionManager(worldModel).initAll();
 								worldModel.doAction(TURN_LEFT);
@@ -223,6 +272,35 @@ public class TestingMain {
 								worldModel.doAction(MOVE);
 								it("should locate Wumpus")
 										.expect(worldModel.getChunk(new Point(1, 2)).getPercepts().getWumpus())
+										.toEqual(TRUE);
+							});
+				})
+				.test(world -> {
+					world.addWumpus(1, 2);
+					init("Aw: detect Wumpus and kill wumpus", new WorldModel(world))
+							.test(worldModel -> {
+								new AssumptionManager(worldModel).initAll();
+								worldModel.doAction(MOVE);
+								worldModel.doAction(TURN_LEFT);
+								worldModel.doAction(MOVE);
+								it("should detect wumpus")
+										.expect(worldModel.getChunk(new Point(0, 1)).getPercepts().getWumpus())
+										.toEqual(TRUE);
+								worldModel.doAction(TURN_LEFT);
+								worldModel.doAction(SHOOT);
+								it("should assume wumpus is dead")
+										.expect(worldModel.getChunk(new Point(0, 1)).getPercepts().getWumpus())
+										.toEqual(FALSE);
+							});
+				})
+				.test(world -> {
+					world.addWumpus(1, 2);
+					init("Aw: shooting and not detecting Wumpus", new WorldModel(world))
+							.test(worldModel -> {
+								new AssumptionManager(worldModel).initAll();
+								worldModel.doAction(SHOOT);
+								it("should detect wumpus")
+										.expect(worldModel.getChunk(new Point(0, 1)).getPercepts().getWumpus())
 										.toEqual(TRUE);
 							});
 				})

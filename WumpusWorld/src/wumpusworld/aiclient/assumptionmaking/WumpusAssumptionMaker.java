@@ -2,15 +2,21 @@ package wumpusworld.aiclient.assumptionmaking;
 
 
 import wumpusworld.aiclient.Action;
+import wumpusworld.aiclient.Direction;
 import wumpusworld.aiclient.model.Chunk;
 import wumpusworld.aiclient.model.PerceptChanged;
+import wumpusworld.aiclient.model.Point;
 import wumpusworld.aiclient.model.WorldModel;
 import wumpusworld.aiclient.util.EventHandler;
 import wumpusworld.aiclient.util.EventInterface;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Objects;
+import java.util.Optional;
 
 import static wumpusworld.aiclient.Action.SHOOT;
+import static wumpusworld.aiclient.Direction.*;
 import static wumpusworld.aiclient.Percept.WUMPUS;
 import static wumpusworld.aiclient.model.TFUValue.FALSE;
 import static wumpusworld.aiclient.model.TFUValue.TRUE;
@@ -31,6 +37,8 @@ public class WumpusAssumptionMaker implements AssumptionMaker {
 	private HashMap<EventHandler<?>, EventInterface<?>> listeners;
 	private boolean done;
 	private boolean wumpusAlive;
+	private boolean hasArrow;
+	private boolean wumpusLocated;
 	private int chunksWithNoWumpus;
 
 
@@ -44,6 +52,11 @@ public class WumpusAssumptionMaker implements AssumptionMaker {
 	@Override
 	public boolean isDone() {
 		return done;
+	}
+
+
+	public boolean isWumpusLocated() {
+		return wumpusLocated;
 	}
 
 
@@ -66,8 +79,11 @@ public class WumpusAssumptionMaker implements AssumptionMaker {
 	@Override
 	public void updateAll() {
 		done = false;
+		wumpusLocated = false;
 		subscribe();
 
+		initArrowShot();
+		if (done) return;
 		initInvokeWumpusKilled();
 		if (done) return;
 		initWumpusLocated();
@@ -118,13 +134,17 @@ public class WumpusAssumptionMaker implements AssumptionMaker {
 
 
 	private void onPreDone() {
-		unsubscribe();
+		if (!worldModel.isWumpusAlive() || !worldModel.hasArrow()) // we don't want to terminate the process if Wumpus is still alive or the player, since the player may still shoot it
+			unsubscribe();
 	}
 
 
 	private void onDone() {
-		unsubscribe();
-		done = true;
+		wumpusLocated = true;
+		if (!worldModel.isWumpusAlive() || !worldModel.hasArrow()) { // we don't want to terminate the process if Wumpus is still alive or the player, since the player may still shoot it
+			unsubscribe();
+			done = true;
+		}
 	}
 
 
@@ -132,6 +152,7 @@ public class WumpusAssumptionMaker implements AssumptionMaker {
 
 	private void onAction(Action action) {
 		if (action == SHOOT) {
+			invokeArrowShot();
 			invokeWumpusKilled();
 		}
 	}
@@ -155,6 +176,11 @@ public class WumpusAssumptionMaker implements AssumptionMaker {
 	}
 
 
+
+
+	private void initArrowShot() {
+		this.hasArrow = worldModel.hasArrow();
+	}
 
 
 	private void initInvokeWumpusKilled() {
@@ -199,6 +225,14 @@ public class WumpusAssumptionMaker implements AssumptionMaker {
 	}
 
 
+
+
+	private void invokeArrowShot() {
+		if (hasArrow && !worldModel.hasArrow()) { // arrow has actually been shot now
+			this.hasArrow = false;
+			onArrowShot();
+		}
+	}
 
 
 	private void invokeWumpusKilled() {
@@ -265,6 +299,24 @@ public class WumpusAssumptionMaker implements AssumptionMaker {
 	}
 
 
+
+
+	private void onArrowShot() {
+		Point location = worldModel.getPlayerLocation();
+		Direction direction = worldModel.getPlayerDirection();
+
+		Point pointToModify = location;
+		while (worldModel.isValidPosition(pointToModify)) {
+			worldModel.getPercepts(pointToModify).setWumpus(FALSE);
+			int dx = direction == RIGHT ? 1
+					: direction == LEFT ? -1
+					: 0;
+			int dy = direction == UP ? 1
+					: direction == DOWN ? -1
+					: 0;
+			pointToModify = pointToModify.translate(dx, dy);
+		}
+	}
 
 
 	private void onWumpusKilled() {

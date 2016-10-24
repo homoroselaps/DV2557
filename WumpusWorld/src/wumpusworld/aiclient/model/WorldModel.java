@@ -265,7 +265,10 @@ public class WorldModel implements Cloneable {
 
 	@Override
 	public Object clone() throws CloneNotSupportedException {
-		return new WorldModel(world.cloneWorld(), percepts.clone());
+		PerceptCollection[] newPerceptCollection = new PerceptCollection[percepts.length];
+		for (int i = 0; i < percepts.length; i++)
+			newPerceptCollection[i] = (PerceptCollection) percepts[i].clone();
+		return new WorldModel(world.cloneWorld(), newPerceptCollection);
 	}
 
 

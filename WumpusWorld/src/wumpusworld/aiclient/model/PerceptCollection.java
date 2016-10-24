@@ -298,7 +298,7 @@ public class PerceptCollection implements Cloneable {
 
 
 	@Override
-	protected Object clone() throws CloneNotSupportedException {
+	protected Object clone() {
 		return new PerceptCollection(this.value);
 	}
 
