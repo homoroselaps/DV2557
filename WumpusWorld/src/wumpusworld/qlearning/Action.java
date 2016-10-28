@@ -13,11 +13,7 @@ public enum Action {
 
     public World makeAction(World world){
         World result = null;
-        try {
-            result = world.clone();
-        } catch (CloneNotSupportedException e) {
-            throw new RuntimeException();
-        }
+        result = world.cloneWorld();
         result.doAction(getCommandName());
         return result;
     }

@@ -60,13 +60,13 @@ public class LearningAgent implements Agent {
         ////System.out.println("action: " + action);
         // calculate utility value
         World nextWorld = action.makeAction(w);
-        State nextState = new State(nextWorld);
+        State nextState = new State(nextWorld, w, currentState, action);
         double oldUtil = q.getValue(currentState, action);
         double futureUtil = Arrays.stream(Action.values())
             .mapToDouble(a -> q.getValue(nextState, a))
             .max().getAsDouble();
         double newUtil = oldUtil + alpha
-            * (getReward(nextWorld) + gamma * futureUtil - oldUtil);
+            * (getReward(nextWorld, action) + gamma * futureUtil - oldUtil);
         // update utility
         q.setValue(currentState, action, newUtil);
         // increase count of state action pair
@@ -86,8 +86,27 @@ public class LearningAgent implements Agent {
         }*/
     }
 
-    private double getReward(World nextWorld) {
-        return nextWorld.getScore() - w.getScore();
+    private double getReward(World nextWorld, Action action) {
+        double result = -1;
+        switch (action) {
+            case grabGold:
+                if(nextWorld.hasGold()){
+                    result += 1000;
+                }
+                break;
+            case shoot:
+                result -= 10;
+                break;
+            case move:
+                if(nextWorld.hasWumpus(nextWorld.getPlayerX(), nextWorld.getPlayerY())){
+                    result -= 1000;
+                }
+                if(nextWorld.hasPit(nextWorld.getPlayerX(), nextWorld.getPlayerY())){
+                    result -= 1000;
+                }
+                break;
+        }
+        return result;
     }
 
     private Action getNextAction() {
