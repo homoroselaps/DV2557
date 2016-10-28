@@ -598,4 +598,15 @@ public class World implements Cloneable
         
         return true;    
     }
+
+    @Override
+    public World clone() throws CloneNotSupportedException {
+        World other = cloneWorld();
+        other.score = this.score;
+        other.hasGold = this.hasGold;
+        other.hasArrow = this.hasArrow;
+        other.isInPit = this.isInPit;
+        other.wumpusAlive = this.wumpusAlive;
+        return other;
+    }
 }
