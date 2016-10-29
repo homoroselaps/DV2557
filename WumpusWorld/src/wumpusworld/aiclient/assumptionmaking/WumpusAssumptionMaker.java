@@ -84,7 +84,7 @@ public class WumpusAssumptionMaker implements AssumptionMaker {
 
 		initArrowShot();
 		if (done) return;
-		initInvokeWumpusKilled();
+		initWumpusKilled();
 		if (done) return;
 		initWumpusLocated();
 		if (done) return;
@@ -134,8 +134,7 @@ public class WumpusAssumptionMaker implements AssumptionMaker {
 
 
 	private void onPreDone() {
-		if (!worldModel.isWumpusAlive() || !worldModel.hasArrow()) // we don't want to terminate the process if Wumpus is still alive or the player, since the player may still shoot it
-			unsubscribe();
+		unsubscribe();
 	}
 
 
@@ -163,7 +162,6 @@ public class WumpusAssumptionMaker implements AssumptionMaker {
 		invokeChunkWithNoStenchDiscovered(chunk);
 		invokeChunkWithStenchDiscovered(chunk);
 		invokeChunkWithStenchHasOnlyOneAdjacentChunkWithWumpusLeft(chunk, true);
-		invokeOnlyOneChunkWithWumpusRemaining();
 	}
 
 
@@ -172,6 +170,7 @@ public class WumpusAssumptionMaker implements AssumptionMaker {
 
 		if (perceptChanged.getPercept() == WUMPUS) {
 			invokeWumpusLocated(chunk);
+			invokeOnlyOneChunkWithWumpusRemaining();
 		}
 	}
 
@@ -183,7 +182,7 @@ public class WumpusAssumptionMaker implements AssumptionMaker {
 	}
 
 
-	private void initInvokeWumpusKilled() {
+	private void initWumpusKilled() {
 		this.wumpusAlive = true;
 		invokeWumpusKilled();
 	}
@@ -201,7 +200,6 @@ public class WumpusAssumptionMaker implements AssumptionMaker {
 
 	private void initChunkWithNoStenchDiscovered() {
 		Arrays.stream(worldModel.getChunks())
-				.filter(chunk -> chunk.getPercepts().getStench() == FALSE)
 				.forEach(this::invokeChunkWithNoStenchDiscovered);
 	}
 
@@ -268,7 +266,7 @@ public class WumpusAssumptionMaker implements AssumptionMaker {
 
 		Optional<Chunk> theOnlyOne = chunk.getOnlyChunkWithSatisfiablePercept(WUMPUS);
 		if (theOnlyOne.isPresent()) {
-			onChunkWithStenchHasOnlyOneAdjacentChunkWithWumpusLeft(chunk, theOnlyOne.get());
+			onChunkWithStenchHasOnlyOneAdjacentChunkWithWumpusLeft(theOnlyOne.get());
 		} else if (subscribe) {
 			Arrays.stream(chunk.getAdjacent())
 					.filter(c -> c.getPercepts().getStench().isSatisfiable())
@@ -321,6 +319,7 @@ public class WumpusAssumptionMaker implements AssumptionMaker {
 
 	private void onWumpusKilled() {
 		onPreDone();
+		this.wumpusLocated = true;
 		Arrays.stream(worldModel.getChunks())
 				.forEach(chunk -> chunk.getPercepts().setWumpus(FALSE));
 		onDone();
@@ -328,11 +327,14 @@ public class WumpusAssumptionMaker implements AssumptionMaker {
 
 
 	private void onWumpusLocated(Chunk chunk) {
-		onPreDone();
+		if(!worldModel.hasArrow())
+			onPreDone(); // Wumpus has been located and cannot be shot => we're done
+		this.wumpusLocated = true;
 		Arrays.stream(worldModel.getChunks())
 				.filter(c -> !c.equals(chunk))
 				.forEach(c -> c.getPercepts().setWumpus(FALSE));
-		onDone();
+		if(!worldModel.hasArrow())
+			onDone(); // Wumpus has been located and cannot be shot => we're done
 	}
 
 
@@ -349,20 +351,13 @@ public class WumpusAssumptionMaker implements AssumptionMaker {
 	}
 
 
-	private void onChunkWithStenchHasOnlyOneAdjacentChunkWithWumpusLeft(Chunk chunk, Chunk adjacentChunk) {
-		onPreDone();
-		Arrays.stream(worldModel.getChunks())
-				.filter(c -> !c.equals(chunk))
-				.forEach(c -> c.getPercepts().setWumpus(FALSE));
+	private void onChunkWithStenchHasOnlyOneAdjacentChunkWithWumpusLeft(Chunk adjacentChunk) {
 		adjacentChunk.getPercepts().setWumpus();
-		onDone();
 	}
 
 
 	private void onOnlyOneChunkWithWumpusRemaining(Chunk chunk) {
-		onPreDone();
 		chunk.getPercepts().setWumpus();
-		onDone();
 	}
 
 

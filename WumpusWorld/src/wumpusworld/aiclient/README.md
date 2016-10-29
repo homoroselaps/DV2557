@@ -64,6 +64,7 @@ Possibilities of assuming the absence of gold in a certain chunk:
 
 * Gold has already been picked up
 * Gold has been located in a different chunk
+* Chunk with no glitter is detected
 
 Possibilities of assuming the presence of gold:
 
@@ -105,6 +106,7 @@ Note: we say that a 3V variable satisfies a certain condition if and only if the
 With all these functions, we can write statements, similar to Boolean's algebra. Since we are using 3VL, we need to define our operations of conjunction, disjunction, negation and implication in 3VL, which shall be the same as in Łukasiewicz's 3Ł logic. This way, all assumptions can be converted to implications, which are true even if all both LHS and RHS of the implication are unknown. For more information on Łukasiewicz Ł3, please refer to [this Wikipedia page](https://en.wikipedia.org/wiki/Three-valued_logic).
 
 Let's define the following operators:
+
 * !X - not X
 * X & Y - X and Y
 * X | Y - X or Y
@@ -202,7 +204,9 @@ By transforming our assumptions to actions, we have managed to analyze, when we 
 
 # Implementation
 
-In our case, there are several classes and interfaces that exist in order to implement the logic that we've just discussed. They can be found in `wumpusworld.aiclient.assumptionmaking` package.
+Should we use any logic-languages to describe our actions? Our implementation needs to fulfil the following two sections: invoking actions and carrying out action's entailment sentence. The first is implementation-dependant and it would make no sense to use any logic-languages to implement it. The second part only contains a simple entailment statement. Checking if it's premise is true only takes one line of code and adding the conclusion to our KB is also implementation-dependant. Therefore it makes no sense to use any logic-languages to implement our actions.
+
+In our case, there are several classes and interfaces that exist in order to implement all the actions. They can be found in `wumpusworld.aiclient.assumptionmaking` package.
 
 * `AssumptionMaker` - (interface) describes the general idea of which functionalities assumption-making classes should have. Please refer to code documentation for more information.
 * `WumpusAssumptionMaker` - manages and executes actions related to Wumpus.

@@ -13,7 +13,7 @@ import java.util.Arrays;
 import java.util.stream.IntStream;
 
 import static wumpusworld.aiclient.Action.*;
-import static wumpusworld.aiclient.Percept.*;
+import static wumpusworld.aiclient.Percept.STENCH;
 import static wumpusworld.aiclient.model.TFUValue.*;
 import static wumpusworld.aiclient.testing.UnitTests.*;
 
@@ -157,9 +157,9 @@ public class TestingMain {
 				})
 				.test(world -> {
 					world.addWumpus(3, 3);
-					init("Aw0: Arrow has been shoot through a cell", new WorldModel(world))
+					init("Aw0: Arrow has been shoot through a chunk", new WorldModel(world))
 							.test(worldModel -> {
-								new AssumptionManager(worldModel).initAll();
+								new WumpusAssumptionMaker(worldModel).init();
 								worldModel.doAction(SHOOT);
 								it("should detect Wumpus' absence")
 										.expect(worldModel.getChunk(new Point(2, 0)).getPercepts().getWumpus())
@@ -170,7 +170,7 @@ public class TestingMain {
 					world.addWumpus(2, 1);
 					init("Aw1: Wumpus has been killed", new WorldModel(world))
 							.test(worldModel -> {
-								new AssumptionManager(worldModel).initAll();
+								new WumpusAssumptionMaker(worldModel).init();
 								worldModel.doAction(SHOOT);
 								it("should detect wumpus killed")
 										.expect(worldModel.getChunk(new Point(1, 0)).getPercepts().getWumpus())
@@ -182,9 +182,9 @@ public class TestingMain {
 				})
 				.test(world -> {
 					world.addWumpus(1, 1);
-					init("Aw2: Wumpus has been located in a difference cell", new WorldModel(world))
+					init("Aw2: Wumpus has been located in a difference chunk", new WorldModel(world))
 							.test(worldModel -> {
-										new AssumptionManager(worldModel).initAll();
+										new WumpusAssumptionMaker(worldModel).init();
 										it("should locate Wumpus")
 												.expect(worldModel.getChunk(new Point(0, 0)))
 												.to(obj -> obj.getPercepts().getWumpus() == TRUE)
@@ -196,9 +196,9 @@ public class TestingMain {
 				})
 				.test(world -> {
 					world.addWumpus(3, 3);
-					init("Aw3: An adjacent cell does not contain stench", new WorldModel(world))
+					init("Aw3: An adjacent chunk does not contain stench", new WorldModel(world))
 							.test(worldModel -> {
-								new AssumptionManager(worldModel).initAll();
+								new WumpusAssumptionMaker(worldModel).init();
 								it("should detect Wumpus' absence in spawn")
 										.expect(worldModel.getChunk(new Point(1, 0)).getPercepts().getWumpus())
 										.toEqual(FALSE);
@@ -210,9 +210,9 @@ public class TestingMain {
 				})
 				.test(world -> {
 					world.addWumpus(3, 1);
-					init("Aw4: The cell is not an adjacent cell of a cell with stench", new WorldModel(world))
+					init("Aw4: The chunk is not an adjacent chunk of a chunk with stench", new WorldModel(world))
 							.test(worldModel -> {
-								new AssumptionManager(worldModel).initAll();
+								new WumpusAssumptionMaker(worldModel).init();
 								worldModel.doAction(MOVE);
 								it("should detect Wumpus' absence")
 										.expect(worldModel.getChunk(new Point(0, 1)).getPercepts().getWumpus())
@@ -221,9 +221,9 @@ public class TestingMain {
 				})
 				.test(world -> {
 					world.addWumpus(1, 2);
-					init("Aw5: A cell with stench property has only one adjacent cell that may contain Wumpus", new WorldModel(world))
+					init("Aw5: A chunk with stench property has only one adjacent chunk that may contain Wumpus", new WorldModel(world))
 							.test(worldModel -> {
-								new AssumptionManager(worldModel).initAll();
+								new WumpusAssumptionMaker(worldModel).init();
 								worldModel.doAction(MOVE);
 								it("should locate Wumpus")
 										.expect(worldModel.getChunk(new Point(0, 1)).getPercepts().getWumpus())
@@ -235,9 +235,9 @@ public class TestingMain {
 				})
 				.test(world -> {
 					world.addWumpus(4, 4);
-					init("Aw6: All cells but one may not contain Wumpus", new WorldModel(world))
+					init("Aw6: All chunks but one may not contain Wumpus", new WorldModel(world))
 							.test(worldModel -> {
-								new AssumptionManager(worldModel).initAll();
+								new WumpusAssumptionMaker(worldModel).init();
 								IntStream.range(0, 3).forEach(i -> worldModel.doAction(MOVE));
 								worldModel.doAction(TURN_LEFT);
 								worldModel.doAction(MOVE);
@@ -254,9 +254,9 @@ public class TestingMain {
 				})
 				.test(world -> {
 					world.addWumpus(2, 3);
-					init("Aw: combination", new WorldModel(world))
+					init("Aw: combination #1", new WorldModel(world))
 							.test(worldModel -> {
-								new AssumptionManager(worldModel).initAll();
+								new WumpusAssumptionMaker(worldModel).init();
 								worldModel.doAction(TURN_LEFT);
 								worldModel.doAction(MOVE);
 								worldModel.doAction(MOVE);
@@ -276,10 +276,29 @@ public class TestingMain {
 							});
 				})
 				.test(world -> {
+					world.addWumpus(2, 4);
+					init("Aw: combination #2", new WorldModel(world))
+							.test(worldModel -> {
+								new WumpusAssumptionMaker(worldModel).init();
+								worldModel.doAction(TURN_LEFT);
+								worldModel.doAction(SHOOT);
+								worldModel.doAction(TURN_RIGHT);
+								IntStream.range(0, 3).forEach(value -> worldModel.doAction(MOVE));
+								worldModel.doAction(TURN_LEFT);
+								worldModel.doAction(MOVE);
+								worldModel.doAction(MOVE);
+								worldModel.doAction(TURN_LEFT);
+								worldModel.doAction(MOVE);
+								it("should locate Wumpus")
+										.expect(worldModel.getChunk(new Point(1, 3)).getPercepts().getWumpus())
+										.toEqual(TRUE);
+							});
+				})
+				.test(world -> {
 					world.addWumpus(1, 2);
 					init("Aw: detect Wumpus and kill wumpus", new WorldModel(world))
 							.test(worldModel -> {
-								new AssumptionManager(worldModel).initAll();
+								new WumpusAssumptionMaker(worldModel).init();
 								worldModel.doAction(MOVE);
 								worldModel.doAction(TURN_LEFT);
 								worldModel.doAction(MOVE);
@@ -297,7 +316,7 @@ public class TestingMain {
 					world.addWumpus(1, 2);
 					init("Aw: shooting and not detecting Wumpus", new WorldModel(world))
 							.test(worldModel -> {
-								new AssumptionManager(worldModel).initAll();
+								new WumpusAssumptionMaker(worldModel).init();
 								worldModel.doAction(SHOOT);
 								it("should detect wumpus")
 										.expect(worldModel.getChunk(new Point(0, 1)).getPercepts().getWumpus())
@@ -324,34 +343,59 @@ public class TestingMain {
 										.toEqual(true);
 							});
 				})
-				.test(world -> init("Ap1: An adjacent cell does not contain breeze", new WorldModel(world))
-						.test(worldModel -> {
-							new AssumptionManager(worldModel).initAll();
-							it("should detect absence of pi #1")
-									.expect(worldModel.getChunk(new Point(0, 1)).getPercepts().getPit())
-									.toEqual(FALSE)
-									.and()
-									.expect(worldModel.getChunk(new Point(0, 2)).getPercepts().getPit())
-									.toEqual(UNKNOWN);
-							worldModel.doAction(MOVE);
-							it("should detect absence of pit #2")
-									.expect(worldModel.getChunk(new Point(2, 0)).getPercepts().getPit())
-									.toEqual(FALSE)
-									.and()
-									.expect(worldModel.getChunk(new Point(2, 2)).getPercepts().getPit())
-									.toEqual(UNKNOWN);
-						}))
 				.test(world -> {
-					world.addGold(4, 1);
+					init("Ap0: An adjacent chunk does not contain breeze", new WorldModel(world))
+							.test(worldModel -> {
+								new PitAssumptionMaker(worldModel).init();
+								it("should detect absence of pi #1")
+										.expect(worldModel.getChunk(new Point(0, 1)).getPercepts().getPit())
+										.toEqual(FALSE)
+										.and()
+										.expect(worldModel.getChunk(new Point(0, 2)).getPercepts().getPit())
+										.toEqual(UNKNOWN);
+								worldModel.doAction(MOVE);
+								it("should detect absence of pit #2")
+										.expect(worldModel.getChunk(new Point(2, 0)).getPercepts().getPit())
+										.toEqual(FALSE)
+										.and()
+										.expect(worldModel.getChunk(new Point(2, 2)).getPercepts().getPit())
+										.toEqual(UNKNOWN);
+							});
+				})
+				.test(world -> {
+					world.addPit(1, 2);
+					init("Ap1: A chunk with breeze property has only one adjacent chunk that may contain a pit", new WorldModel(world))
+							.test(worldModel -> {
+								new PitAssumptionMaker(worldModel).init();
+								worldModel.doAction(MOVE);
+								it("should locate pit")
+										.expect(worldModel.getChunk(new Point(0, 1)).getPercepts().getPit())
+										.toEqual(TRUE);
+							});
+				})
+				.test(world -> {
+					world.addGold(2, 1);
 					WorldModel worldModel = new WorldModel(world);
 					init("gold assumption maker", new GoldAssumptionMaker(worldModel))
 							.test(goldAssumptionMaker -> {
 								goldAssumptionMaker.init();
-								IntStream.range(0, 2).forEach(i -> worldModel.doAction(MOVE));
+								it("should not locate gold")
+										.expect(goldAssumptionMaker.isGoldLocated())
+										.toEqual(false);
 								it("should not be done")
 										.expect(goldAssumptionMaker.isDone())
 										.toEqual(false);
 								worldModel.doAction(MOVE);
+								it("should locate gold")
+										.expect(goldAssumptionMaker.isGoldLocated())
+										.toEqual(true);
+								it("should not be done")
+										.expect(goldAssumptionMaker.isDone())
+										.toEqual(false);
+								worldModel.doAction(GRAB);
+								it("should locate gold")
+										.expect(goldAssumptionMaker.isGoldLocated())
+										.toEqual(true);
 								it("should be done")
 										.expect(goldAssumptionMaker.isDone())
 										.toEqual(true);
@@ -359,12 +403,13 @@ public class TestingMain {
 				})
 				.test(world -> {
 					world.addGold(1, 1);
-					init("Ag1: When glitter is detected.", new WorldModel(world))
+					init("Ag0: Gold has already been picked up", new WorldModel(world))
 							.test(worldModel -> {
-								new AssumptionManager(worldModel).initAll();
-								it("should locate gold in spawn")
+								new GoldAssumptionMaker(worldModel).init();
+								worldModel.doAction(GRAB);
+								it("should determine absence of gold everywhere")
 										.expect(worldModel.getChunk(new Point(0, 0)).getPercepts().getGold())
-										.toEqual(TRUE)
+										.toEqual(FALSE)
 										.and()
 										.expect(worldModel.getChunk(new Point(2, 2)).getPercepts().getGold())
 										.toEqual(FALSE);
@@ -372,16 +417,70 @@ public class TestingMain {
 				})
 				.test(world -> {
 					world.addGold(2, 1);
-					init("Ag1: When glitter is detected", new WorldModel(world))
+					init("Ag1: Gold has been located in a different chunk", new WorldModel(world))
+							.test(worldModel -> {
+								new GoldAssumptionMaker(worldModel).init();
+								worldModel.doAction(MOVE);
+								it("should detect absence of gold")
+										.expect(worldModel.getChunk(new Point(2, 2)).getPercepts().getGold())
+										.toEqual(FALSE);
+							});
+				})
+				.test(world -> {
+					init("Ag2: Chunk with no glitter is detected", new WorldModel(world))
+							.test(worldModel -> {
+								new GoldAssumptionMaker(worldModel).init();
+								it("should detect gold's absence in spawn")
+										.expect(worldModel.getChunk(new Point(0, 0)).getPercepts().getGold())
+										.toEqual(FALSE);
+								worldModel.doAction(MOVE);
+								it("should detect gold's absence")
+										.expect(worldModel.getChunk(new Point(1, 0)).getPercepts().getGold())
+										.toEqual(FALSE);
+							});
+				})
+				.test(world -> {
+					world.addGold(1, 1);
+					init("Ag3: A chunk with glitter property has been located", new WorldModel(world))
 							.test(worldModel -> {
 								new AssumptionManager(worldModel).initAll();
+								it("should locate gold in spawn")
+										.expect(worldModel.getChunk(new Point(0, 0)).getPercepts().getGold())
+										.toEqual(TRUE);
+							});
+				})
+				.test(world -> {
+					world.addGold(2, 1);
+					init("Ag3: A chunk with glitter property has been located", new WorldModel(world))
+							.test(worldModel -> {
+								new GoldAssumptionMaker(worldModel).init();
 								worldModel.doAction(MOVE);
 								it("should locate gold")
 										.expect(worldModel.getChunk(new Point(1, 0)).getPercepts().getGold())
-										.toEqual(TRUE)
-										.and()
-										.expect(worldModel.getChunk(new Point(2, 3)).getPercepts().getGold())
-										.toEqual(FALSE);
+										.toEqual(TRUE);
+							});
+				})
+				.test(world -> {
+					world.addGold(1, 4);
+					init("Ag4: All chunks but one may contain gold", new WorldModel(world))
+							.test(worldModel -> {
+								new GoldAssumptionMaker(worldModel).init();
+								IntStream.range(0, 3).forEach(value -> worldModel.doAction(MOVE));
+								worldModel.doAction(TURN_LEFT);
+								worldModel.doAction(MOVE);
+								worldModel.doAction(TURN_LEFT);
+								IntStream.range(0, 3).forEach(value -> worldModel.doAction(MOVE));
+								worldModel.doAction(TURN_RIGHT);
+								worldModel.doAction(MOVE);
+								worldModel.doAction(TURN_RIGHT);
+								IntStream.range(0, 3).forEach(value -> worldModel.doAction(MOVE));
+								worldModel.doAction(TURN_LEFT);
+								worldModel.doAction(MOVE);
+								worldModel.doAction(TURN_LEFT);
+								IntStream.range(0, 2).forEach(value -> worldModel.doAction(MOVE));
+								it("should locate gold")
+										.expect(worldModel.getChunk(new Point(0, 3)).getPercepts().getGold())
+										.toEqual(TRUE);
 							});
 				})
 				.test(world -> {
