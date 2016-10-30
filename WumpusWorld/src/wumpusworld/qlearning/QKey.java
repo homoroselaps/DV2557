@@ -4,6 +4,13 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
+ * <p>
+ *     Key for the table in {@link QTable}
+ * </p>
+ * <p>
+ *     Stores the {@link State} and {@link Action} of an agent and can be serialized by the Jackson Json library
+ * </p>
+ *
  * Created by smarti on 15.10.16.
  */
 public class QKey {

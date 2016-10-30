@@ -6,6 +6,10 @@ import static org.junit.Assert.*;
  * Created by smarti on 15.10.16.
  */
 public class QTableTest {
+    /**
+     * tests if the json writing and reading works correctly
+     * @throws Exception
+     */
     @org.junit.Test
     public void writeAndRead() throws Exception {
         QTable<Double> q = new QTable<>(0.0);

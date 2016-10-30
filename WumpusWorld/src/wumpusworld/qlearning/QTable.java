@@ -13,6 +13,7 @@ import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
 /**
+ * Class that wraps a HashMap to store the QTable and the Counttable
  * Created by smarti on 14.10.16.
  */
 public class QTable<T> {
@@ -27,6 +28,10 @@ public class QTable<T> {
         this.defaultUtility = defaultUtility;
     }
 
+    /**
+     * write to json file
+     * @param fileName
+     */
     public void writeTable(String fileName){
         ObjectMapper om = new ObjectMapper();
         try {
@@ -36,6 +41,10 @@ public class QTable<T> {
         }
     }
 
+    /**
+     * read from json file
+     * @param fileName
+     */
     public void readTable(String fileName){
         ObjectMapper om = new ObjectMapper();
         try {
@@ -48,6 +57,12 @@ public class QTable<T> {
         }
     }
 
+    /**
+     * retrieve stored value from table
+     * @param state the state
+     * @param action the action
+     * @return the stored value or a default value
+     */
     public T getValue(State state, Action action){
         T result = defaultUtility.get();
         //TODO maybe other default value than 0
@@ -57,6 +72,12 @@ public class QTable<T> {
         return result;
     }
 
+    /**
+     * update stored value
+     * @param state the state
+     * @param action the action
+     * @param util the value that should be stored
+     */
     public void setValue(State state, Action action, T util){
         q.put(new QKey(state, action), util);
     }

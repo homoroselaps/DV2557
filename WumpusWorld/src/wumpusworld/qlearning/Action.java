@@ -4,19 +4,13 @@ import wumpusworld.World;
 
 /**
  * Wrapper class for the actions an agent can perform.
- * String constants are ugly
+ * Main usage for QKey in QTable.
+ * String constants are ugly.
  *
  * Created by smarti on 14.10.16.
  */
 public enum Action {
     grabGold, climb, shoot, turnLeft, turnRight, move;
-
-    public World makeAction(World world){
-        World result = null;
-        result = world.cloneWorld();
-        result.doAction(getCommandName());
-        return result;
-    }
 
     public String getCommandName() {
         String result = null;

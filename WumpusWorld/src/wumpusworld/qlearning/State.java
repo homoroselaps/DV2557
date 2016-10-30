@@ -3,6 +3,7 @@ package wumpusworld.qlearning;
 import wumpusworld.World;
 
 /**
+ * Plain old Java Object that stores an agent's state
  * Created by smarti on 14.10.16.
  */
 public class State {
