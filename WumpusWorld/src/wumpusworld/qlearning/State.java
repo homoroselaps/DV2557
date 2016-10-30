@@ -31,25 +31,6 @@ public class State {
         this.hasArrow = w.hasArrow();
     }
 
-    /**
-     * Constructs State for the {@link World} world
-     * @param world World after the action
-     * @param lastWorld World before action
-     * @param lastState State for lastWorld
-     * @param action action
-     */
-    public State(World world, World lastWorld, State lastState, Action action){
-        this.x = world.getPlayerX();
-        this.y = world.getPlayerY();
-        this.direction = world.getDirection();
-        // in pit if already was in pit and did not climb out, or if just fallen in pit
-        this.inPit = (lastState.isInPit() && !(action == Action.climb)) || world.isInPit();
-        // alive if he was still alive before and was not just shot
-        this.wumpusAlive = world.wumpusAlive() && lastState.isWumpusAlive();
-        // arrow if there was an arrow before and if it was not just shot
-        this.hasArrow = lastState.hasArrow() && action != Action.shoot;
-    }
-
     public int getX() {
         return x;
     }

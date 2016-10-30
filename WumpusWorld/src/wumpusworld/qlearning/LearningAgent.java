@@ -59,21 +59,20 @@ public class LearningAgent implements Agent {
         Action action = getNextAction();
         ////System.out.println("action: " + action);
         // calculate utility value
-        World nextWorld = action.makeAction(w);
-        State nextState = new State(nextWorld, w, currentState, action);
+        w.doAction(action.getCommandName());
+        State nextState = new State(w);
         double oldUtil = q.getValue(currentState, action);
         double futureUtil = Arrays.stream(Action.values())
             .mapToDouble(a -> q.getValue(nextState, a))
             .max().getAsDouble();
         double newUtil = oldUtil + alpha
-            * (getReward(nextWorld, action) + gamma * futureUtil - oldUtil);
+            * (getReward(w, action) + gamma * futureUtil - oldUtil);
         // update utility
         q.setValue(currentState, action, newUtil);
         // increase count of state action pair
         countTable.setValue(currentState, action, countTable.getValue(currentState, action) + 1);
         // do action
         //System.out.println(currentState + " " +  action.toString() + " " + newUtil);
-        w.doAction(action.getCommandName());
         currentState = nextState;
         /*        if(action == Action.shoot){
             System.out.println("Shot arrow");
