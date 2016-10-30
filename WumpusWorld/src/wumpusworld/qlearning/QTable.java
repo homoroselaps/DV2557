@@ -46,12 +46,14 @@ public class QTable<T> {
      * @param fileName
      */
     public void readTable(String fileName){
+        File f = new File(fileName);
+        if(!f.exists() || f.isDirectory()) return;
         ObjectMapper om = new ObjectMapper();
         try {
             TypeFactory typeFactory = om.getTypeFactory();
             MapType mapType = typeFactory.constructMapType(HashMap.class, QKey.class, Double.class);
 
-            this.q = om.readValue(new File(fileName), mapType);
+            this.q = om.readValue(f, mapType);
         } catch (IOException e) {
             e.printStackTrace();
         }

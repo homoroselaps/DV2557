@@ -38,6 +38,8 @@ public class GUI implements ActionListener
     private ImageIcon l_player_down;
     private ImageIcon l_player_left;
     private ImageIcon l_player_right;
+    
+    private final String LEARNED_MAP_FILE = "learnedMap.json";
 
     // trainedQtable
     private QTable<Double> q;
@@ -271,7 +273,7 @@ public class GUI implements ActionListener
                 w = maps.get(i).generateWorld();
             }
             QTable<Double> q = new QTable<>(0.0);
-            q.readTable("learnedMap.json");
+            q.readTable(LEARNED_MAP_FILE);
             agent = new LearningAgent(w, q, new Random(42), 0.2, 0.7, 0.0, 0);
             //agent = new MyAgent(w);
             updateGame();
@@ -281,7 +283,7 @@ public class GUI implements ActionListener
             if (agent == null)
             {
                 QTable<Double> q = new QTable<>(0.0);
-                q.readTable("learnedMap.json");
+                q.readTable(LEARNED_MAP_FILE);
                 agent = new LearningAgent(w, q, new Random(42), 0.2, 0.7, 0.0, 0);
                 //agent = new MyAgent(w);
             }
@@ -290,8 +292,8 @@ public class GUI implements ActionListener
         }
         if (e.getActionCommand().equals("TRAIN")) {
             q = new QTable<Double>(0.0);
-            LearningManager.learn("learnedMap.json", w);
-            q.readTable("learnedMap.json");
+            LearningManager.learn(LEARNED_MAP_FILE, w);
+            q.readTable(LEARNED_MAP_FILE);
             agent = new LearningAgent(w, q, new Random(42), 0.2, 0.7, 0.0, 0);
         }
     }
