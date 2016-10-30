@@ -29,4 +29,8 @@ public class QTableTest {
         p.readTable("sampletable.json");
         assertEquals(q,p);
     }
+
+    public void testReward() throws Exception {
+
+    }
 }

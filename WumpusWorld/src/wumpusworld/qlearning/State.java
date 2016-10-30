@@ -47,7 +47,7 @@ public class State {
         // alive if he was still alive before and was not just shot
         this.wumpusAlive = world.wumpusAlive() && lastState.isWumpusAlive();
         // arrow if there was an arrow before and if it was not just shot
-        this.hasArrow = lastState.isHasArrow() && action != Action.shoot;
+        this.hasArrow = lastState.hasArrow() && action != Action.shoot;
     }
 
     public int getX() {
@@ -66,7 +66,7 @@ public class State {
         return inPit;
     }
 
-    public boolean isHasArrow() {
+    public boolean hasArrow() {
         return hasArrow;
     }
 

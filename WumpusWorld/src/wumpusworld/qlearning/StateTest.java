@@ -1,6 +1,5 @@
 package wumpusworld.qlearning;
 
-import jdk.nashorn.internal.runtime.regexp.joni.ast.StateNode;
 import wumpusworld.MapReader;
 import wumpusworld.World;
 
