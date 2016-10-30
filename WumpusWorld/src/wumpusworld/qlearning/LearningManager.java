@@ -10,16 +10,29 @@ import java.util.stream.IntStream;
  */
 public class LearningManager {
 
+    public static void learn(String fileName, World world){
+        learnUntilStop(fileName, world, 1500);
+    }
+
+    public static void learn(String fileName, int map){
+        learnUntilStop(fileName, map, 1500);
+    }
+
     public static void learnUntilStop(String fileName, int map, int times) {
+        World world = new MapReader().readMaps().get(map).generateWorld();
+        learnUntilStop(fileName, world, times);
+    }
+
+    public static void learnUntilStop(String fileName, World world, int times) {
         QTable<Double> q = new QTable<>(0.0);
         int lastScore = 0;
         for (int i = 0; i < times; ++i) {
-            World world = new MapReader().readMaps().get(map).generateWorld();
-            Agent a = new LearningAgent(world, q, new Random(42), 0.2, 0.7, 1.05 - (i+1)/(double)times, 10);
-            while(!world.gameOver()) {
+            World startingWorld = world.cloneWorld();
+            Agent a = new LearningAgent(startingWorld, q, new Random(42), 0.2, 0.7, 1.05 - (i+1)/(double)times, 10);
+            while(!startingWorld.gameOver()) {
                 a.doAction();
             }
-            lastScore = world.getScore();
+            lastScore = startingWorld.getScore();
             q.writeTable(fileName);
         }
         System.out.println("GameOver. Score: " + lastScore);
