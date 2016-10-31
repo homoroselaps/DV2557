@@ -1,7 +1,5 @@
 package wumpusworld;
 
-import jdk.nashorn.internal.objects.annotations.Where;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 import wumpusworld.aiclient.Action;
 import wumpusworld.aiclient.Direction;
 import wumpusworld.aiclient.assumptionmaking.AssumptionManager;
@@ -14,7 +12,7 @@ import java.util.Comparator;
 
 import static wumpusworld.aiclient.model.TFUValue.*;
 
-public class MyAgent implements Agent {
+public class LogicAgent implements Agent {
     private final WorldModel worldModel;
     private final AssumptionManager assumptionManager;
     private ArrayList<Chunk> safeNeighbours = new ArrayList<Chunk>();
@@ -22,7 +20,7 @@ public class MyAgent implements Agent {
     private ArrayList<Chunk> dangerousChunks = new ArrayList<Chunk>();
     private Point lastKnownLocation = new Point();
 
-    public MyAgent(World world) {
+    public LogicAgent(World world) {
         this.worldModel = new WorldModel(world);
         this.assumptionManager = new AssumptionManager(this.worldModel);
         this.assumptionManager.initAll();

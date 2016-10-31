@@ -194,10 +194,14 @@ public class GUI implements ActionListener
         mapList = new JComboBox(items);
         mapList.setPreferredSize(new Dimension(180,25));
         buttons.add(mapList);
-        JButton bn = new JButton("New Game");
+        JButton bn = new JButton("New Logic Game");
         bn.setActionCommand("NEW");
         bn.addActionListener(this);
         buttons.add(bn);
+        JButton bnq = new JButton("New Learning Game");
+        bnq.setActionCommand("NEWQ");
+        bnq.addActionListener(this);
+        buttons.add(bnq);
         
         frame.getContentPane().add(buttons);
         
@@ -257,14 +261,14 @@ public class GUI implements ActionListener
                 i--;
                 w = maps.get(i).generateWorld();
             }
-            agent = new MyAgent(w);
+            agent = new LogicAgent(w);
             updateGame();
         }
         if (e.getActionCommand().equals("AGENT"))
         {
             if (agent == null)
             {
-                agent = new MyAgent(w);
+                agent = new LogicAgent(w);
             }
             agent.doAction();
             updateGame();
