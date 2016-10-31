@@ -18,7 +18,7 @@ The Wumpus World can be represented as a grid of cells/fields/chunks, where each
 * Glitter	(Gt)
 * Gold		(Gd)
 
-Each of these can be represented with a boolean value of **true** or **false**. However, such representation is only suitable when the environment is fully observable. If the environment is only partially obvervable (as it is in our case), all of these properties can be unknown at a certain point in time.
+Each of these can be represented with a boolean value of **true** or **false**. However, such representation is only suitable when the environment is fully observable. If the environment is only partially observable (as it is in our case), all of these properties can be unknown at a certain point in time.
 
 Therefore, we should introduce another state of each property for every chunk, which is **unknown**. This means each property of every chunk can be represented with exactly one of the following:
 
@@ -26,7 +26,7 @@ Therefore, we should introduce another state of each property for every chunk, w
 * **true** (deterministic value) - represents presence of the property in a chunk (eg. "There is Wumpus in this chunk. Beware!")
 * **unknown** (non-deterministic value) - represents the absence of knowing whether a chunk is or is not present in a chunk (eg. "Wumpus might be in this chunk. Beware!") Not that this state should not be considered as a state, that holds, a *secret* or unknown  value, which will be (or may be) known in the future. While this is (in our case) true, it would be more accurate to say that this value represents a state which's status (presence or absence of a property) cannot be determined.
 
-These values represent their own three-value (3V) type, which cannot be coverted to a boolean type. They introduce a three-valued logic (3VL) strategy to our problem.
+These values represent their own three-value (3V) type, which cannot be converted to a boolean type. They introduce a three-valued logic (3VL) strategy to our problem.
 
 If we used first order logic and boolean values to represent states of chunks, we could accumulate known facts in a collection we would call our Knowledge Base (KB). It would also need to contain information about which chunks have already been visited. But our 3VL approach to the problem would mean our KB would need to store a 3V state for each property for every chunk from the beginning. According to this, it would be easier to store these states in a table, which can also be considered an internal representation of the environment. This is better because:
 

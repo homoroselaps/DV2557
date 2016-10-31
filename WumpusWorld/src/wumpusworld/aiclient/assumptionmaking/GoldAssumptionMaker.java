@@ -14,7 +14,6 @@ import java.util.Objects;
 
 
 import static wumpusworld.aiclient.Percept.GOLD;
-import static wumpusworld.aiclient.Percept.WUMPUS;
 import static wumpusworld.aiclient.model.TFUValue.*;
 
 

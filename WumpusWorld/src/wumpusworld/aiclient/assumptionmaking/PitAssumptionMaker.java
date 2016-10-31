@@ -139,7 +139,7 @@ public class PitAssumptionMaker implements AssumptionMaker {
 	private void invokeChunkWithBreezeHasOnlyOneAdjacentChunkWithPit(Chunk chunk, boolean subscribe) {
 		if (chunk.getPercepts().getBreeze() != TRUE) return;
 
-		Optional<Chunk> theOnlyOne = chunk.getOnlyChunkWithSatisfiablePercept(PIT);
+		Optional<Chunk> theOnlyOne = chunk.getOnlyAdjacentChunkWithSatisfiablePercept(PIT);
 		if (theOnlyOne.isPresent()) {
 			onChunkWithBreezeHasOnlyOneAdjacentChunkWithPit(theOnlyOne.get());
 		} else if (subscribe) {

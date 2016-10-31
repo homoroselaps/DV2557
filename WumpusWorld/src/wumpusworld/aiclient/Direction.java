@@ -3,6 +3,9 @@ package wumpusworld.aiclient;
 
 import wumpusworld.aiclient.model.Point;
 
+
+
+
 /**
  * Represents a direction the player is facing.
  * Created by Nejc on 13. 10. 2016.
@@ -21,25 +24,25 @@ public enum Direction {
     }
 
 
-    public int toLegacyDirection() {
-        return this.ordinal();
+    public static Direction setDirectionToGo(Point fakeVectorPoint) {
+        Direction whereToGo = Direction.RIGHT;
+
+        if (fakeVectorPoint.getX() > 0) {
+            whereToGo = Direction.RIGHT;
+        } else if (fakeVectorPoint.getX() < 0) {
+            whereToGo = Direction.LEFT;
+        } else if (fakeVectorPoint.getY() < 0) {
+            whereToGo = Direction.DOWN;
+        } else if (fakeVectorPoint.getY() > 0) {
+            whereToGo = Direction.UP;
+        }
+
+        return whereToGo;
     }
 
 
-    public Direction setDirectionToGo(Point currentPoint, Point fakeVectorPoint) {
-        Direction WhereToGo = Direction.RIGHT;
-
-        if (fakeVectorPoint.getX() > 0) {
-            WhereToGo = Direction.RIGHT;
-        } else if (fakeVectorPoint.getX() < 0) {
-            WhereToGo = Direction.LEFT;
-        } else if (fakeVectorPoint.getY() < 0) {
-            WhereToGo = Direction.DOWN;
-        } else if (fakeVectorPoint.getY() > 0) {
-            WhereToGo = Direction.UP;
-        }
-
-        return WhereToGo;
+    public int toLegacyDirection() {
+        return this.ordinal();
     }
 
 

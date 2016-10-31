@@ -264,7 +264,7 @@ public class WumpusAssumptionMaker implements AssumptionMaker {
 	private void invokeChunkWithStenchHasOnlyOneAdjacentChunkWithWumpusLeft(Chunk chunk, boolean subscribe) {
 		if (chunk.getPercepts().getStench() != TRUE) return;
 
-		Optional<Chunk> theOnlyOne = chunk.getOnlyChunkWithSatisfiablePercept(WUMPUS);
+		Optional<Chunk> theOnlyOne = chunk.getOnlyAdjacentChunkWithSatisfiablePercept(WUMPUS);
 		if (theOnlyOne.isPresent()) {
 			onChunkWithStenchHasOnlyOneAdjacentChunkWithWumpusLeft(theOnlyOne.get());
 		} else if (subscribe) {

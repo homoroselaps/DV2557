@@ -1,10 +1,6 @@
 package wumpusworld.aiclient.model;
 
 
-import java.util.ArrayList;
-
-import static wumpusworld.aiclient.model.TFUValue.TRUE;
-
 /**
  * An immutable 2-dimensional point.
  * Created by Nejc on 12. 10. 2016.
@@ -12,8 +8,12 @@ import static wumpusworld.aiclient.model.TFUValue.TRUE;
 public class Point implements Cloneable {
 
 
+
+
     private final int x;
     private final int y;
+
+
 
 
     public int getX() {
@@ -32,6 +32,8 @@ public class Point implements Cloneable {
     }
 
 
+
+
     public Point(int x, int y) {
         this.x = x;
         this.y = y;
@@ -44,6 +46,8 @@ public class Point implements Cloneable {
     }
 
 
+
+
     public Point translate(int dx, int dy) {
         return new Point(x + dx, y + dy);
     }
@@ -53,11 +57,10 @@ public class Point implements Cloneable {
         return (y * width) + x;
     }
 
-    public double distance(Point second) {
-        double distance = Math.sqrt(((second.getX() - x) * (second.getX() - x)) + ((second.getY() - y) * (second.getY() - y)));
-        return distance;
-    }
 
+    public double distance(Point second) {
+        return Math.sqrt((second.getX() - x) * (second.getX() - x) + ((second.getY() - y) * (second.getY() - y)));
+    }
 
 
 

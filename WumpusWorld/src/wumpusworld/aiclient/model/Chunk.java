@@ -7,9 +7,7 @@ import java.util.ArrayList;
 import java.util.Objects;
 import java.util.Optional;
 
-import static wumpusworld.aiclient.model.TFUValue.FALSE;
-import static wumpusworld.aiclient.model.TFUValue.TRUE;
-import static wumpusworld.aiclient.model.TFUValue.UNKNOWN;
+
 
 
 /**
@@ -19,8 +17,12 @@ import static wumpusworld.aiclient.model.TFUValue.UNKNOWN;
 public class Chunk {
 
 
+
+
     private final Point point;
     private final WorldModel worldModel;
+
+
 
 
     public WorldModel getWorldModel() {
@@ -38,6 +40,13 @@ public class Chunk {
     }
 
 
+    public boolean isVisited() {
+        return worldModel.isVisited(point);
+    }
+
+
+
+
     public Chunk(WorldModel worldModel, Point point) {
         Objects.requireNonNull(worldModel);
         if (!worldModel.isValidPosition(point))
@@ -46,6 +55,8 @@ public class Chunk {
         this.worldModel = worldModel;
         this.point = point;
     }
+
+
 
 
     public Chunk[] getAdjacent() {
@@ -75,7 +86,7 @@ public class Chunk {
     }
 
 
-    public Optional<Chunk> getOnlyChunkWithSatisfiablePercept(Percept percept) {
+    public Optional<Chunk> getOnlyAdjacentChunkWithSatisfiablePercept(Percept percept) {
         Objects.requireNonNull(percept);
 
         Chunk only = null;
@@ -89,85 +100,13 @@ public class Chunk {
         return Optional.ofNullable(only);
     }
 
-    public int getIndexOfNextNeighour(Chunk[] neighbours, Point finalSafeDestination, Point lastLocation) {
-        int m = 0;
-        if (neighbours[0].getPercepts().isSafe() == false) {
-            m++;
-        }
-
-        for (int l = 0; l < neighbours.length; l++) {
-            if (lastLocation.getX() == neighbours[l].getLocation().getX() && lastLocation.getY() == neighbours[l].getLocation().getY()) {
-                continue;
-            }
-            if (worldModel.isVisited(neighbours[l].getLocation()) == true && neighbours[l].getPercepts().isSafe() == true) {
-
-                if (neighbours[l].getLocation().distance(finalSafeDestination) <= neighbours[m].getLocation().distance(finalSafeDestination)) {
-                    m = l;
-                } else if (lastLocation.getX() == neighbours[m].getLocation().getX() && lastLocation.getY() == neighbours[m].getLocation().getY()) {
-                        m = l;
-                }
-            }
-        }
-        if(neighbours[m].getPercepts().isSafe() == false){
-            for(int i = 0; i<neighbours.length;i++){
-                if (neighbours[i].getPercepts().getSafe() == UNKNOWN){
-                    m=i;
-                    break;
-                }
-            }
-        }
-        return m;
-    }
-
-    public Point getSafeChunks(ArrayList<Chunk> safeNeighbours) {
-        Point wumpusLocation = null;
-        for (int i = 0; i < 4; i++) {
-            for (int j = 0; j < 4; j++) {
-                Point temp = new Point(i, j);
-                if (worldModel.getChunk(temp).getPercepts().isSafe() == true && worldModel.isVisited(temp) == false) {
-                    safeNeighbours.add(worldModel.getChunk(temp));
-                    continue;
-                }
-                if (worldModel.isWumpusAlive() == true) {
-                    if (worldModel.getChunk(temp).getPercepts().getWumpus() == TRUE) {
-                        wumpusLocation = temp;
-                    }
-                }
-
-            }
-        }
-        return wumpusLocation;
-    }
-
-    public void mapSearch(ArrayList<Chunk> safeNeighbours, ArrayList<Chunk> unknownChunks, ArrayList<Chunk> dangerousChunks) {
-
-        for (int i = 0; i < 4; i++) {
-            for (int j = 0; j < 4; j++) {
-                Point temp = new Point(i, j);
-                if (worldModel.getChunk(temp).getPercepts().getPit() == UNKNOWN && worldModel.getChunk(temp).getPercepts().getWumpus() == FALSE  ) {
-                    unknownChunks.add(worldModel.getChunk(temp));
-                } else if (worldModel.getChunk(temp).getPercepts().getGold() == TRUE) {
-                    safeNeighbours.add(worldModel.getChunk(temp));
-                    break;
-                } else if (worldModel.getChunk(temp).getPercepts().getSafe() == FALSE) {
-                    dangerousChunks.add(worldModel.getChunk(temp));
-                }
-            }
-        }
-    }
 
 
-    public void getSafeNeighoubrsToAnArray(ArrayList<Chunk> safeNeighbours, Chunk[] neighbours) {
-        for (int k = 0; k < neighbours.length; k++) {
-            if ((neighbours[k].getPercepts().isSafe() == true) && (worldModel.isVisited(neighbours[k].getLocation()) == false)) {
-                if (safeNeighbours.size() > 0) {
-                    if (safeNeighbours.get(safeNeighbours.size() - 1) != neighbours[k]) {
-                        continue;
-                    }
-                }
-                safeNeighbours.add(neighbours[k]);
-            }
-        }
+
+    public int compareDistances(Chunk second) {
+        double distance1 = worldModel.getPlayerLocation().distance(this.getLocation());
+        double distance2 = worldModel.getPlayerLocation().distance(second.getLocation());
+        return Double.compare(distance2, distance1);
     }
 
 
@@ -192,15 +131,6 @@ public class Chunk {
     @Override
     public String toString() {
         return "Chunk at " + point.toString();
-    }
-
-
-    public int compareTo(Chunk second) {
-
-        double distance1 = worldModel.getPlayerLocation().distance(this.getLocation());
-        double distance2 = worldModel.getPlayerLocation().distance(second.getLocation());
-        return Double.compare(distance2, distance1);
-
     }
 
 
