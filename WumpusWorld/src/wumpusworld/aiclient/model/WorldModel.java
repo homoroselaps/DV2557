@@ -139,6 +139,17 @@ public class WorldModel implements Cloneable {
 		return new Chunk(this, location);
 	}
 
+	public void setRightDirection (Direction PlannedDirection){
+		Direction CurrentDirection = getPlayerDirection();
+
+		while(CurrentDirection != PlannedDirection){
+
+			this.doAction(Action.TURN_RIGHT);
+			CurrentDirection = getPlayerDirection();
+		}
+
+	}
+
 
 	public Chunk getChunk(int index) {
 		return new Chunk(this, toPoint(index));
@@ -177,6 +188,10 @@ public class WorldModel implements Cloneable {
 		return res;
 	}
 
+	public int getScore()
+	{
+		return world.getScore();
+	}
 
 
 
