@@ -4,7 +4,8 @@ package wumpusworld;
 import wumpusworld.aiclient.Action;
 import wumpusworld.aiclient.Direction;
 import wumpusworld.aiclient.assumptionmaking.AssumptionManager;
-import wumpusworld.aiclient.model.*;
+import wumpusworld.aiclient.model.Chunk;
+import wumpusworld.aiclient.model.Point;
 import wumpusworld.aiclient.model.WorldModel;
 
 import java.util.ArrayList;
@@ -16,7 +17,9 @@ import static wumpusworld.aiclient.model.TFUValue.*;
 
 
 
-public class MyAgent implements Agent {
+public class LogicAgent implements Agent {
+
+
 
 
     private final WorldModel worldModel;
@@ -27,7 +30,7 @@ public class MyAgent implements Agent {
 
 
 
-    public MyAgent(World world) {
+    public LogicAgent(World world) {
         this.worldModel = new WorldModel(world);
         this.assumptionManager = new AssumptionManager(this.worldModel);
         this.assumptionManager.initAll();

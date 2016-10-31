@@ -9,7 +9,7 @@ import java.util.Vector;
  * 
  * @author Johan Hagelbäck
  */
-public class World 
+public class World implements Cloneable
 {
     private int size;
     private String[][] w;

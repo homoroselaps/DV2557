@@ -11,12 +11,12 @@ This document will explain:
 
 The Wumpus World can be represented as a grid of cells/fields/chunks, where each chunk contains some (or none) following properties:
 
-* Stench 	(St)
-* Wumpus 	(W)
-* Breeze 	(B)
-* Pit		(P)
-* Glitter	(Gt)
-* Gold		(Gd)
+* Stench    (St)
+* Wumpus    (W)
+* Breeze    (B)
+* Pit       (P)
+* Glitter   (Gt)
+* Gold      (Gd)
 
 Each of these can be represented with a boolean value of **true** or **false**. However, such representation is only suitable when the environment is fully observable. If the environment is only partially observable (as it is in our case), all of these properties can be unknown at a certain point in time.
 
@@ -150,12 +150,12 @@ Let's look at an example assumption statement ADJ(X, Y) & !S(X) => !W(Y) ("If X 
 
 * First, let's convert the assumption statement into an entailment statement: ADJ(X, Y) & !S(X) |= !W(Y) ("If X and Y are adjacent and there is no stench in X, then we've just learned that there is no Wumpus in Y.")
 * Let's convert the entailment statement to an action: Aw(X, Y): !S(X) |= !W(Y), ADJ(X, Y). We can now analyze the action:
-	* Aw(X, Y) is the action, that takes two chunks as arguments.
-		* ADJ(X, Y) is the pre-predicate, which tells us the actions can only be called parameters X and Y, which are adjacent chunks
-			* Note: if there are more pre-predicates available, they are separated by commas
-		* !S(X) |= !W(Y) is the simplified entailment statement (!S(X) is the predicate and !W(Y) is the conclusion)
-			* Note: if there is no predicate in the action, we would write it as: |= F(X)
-	* What this action does, is it adds !W(Y) to our KB, when !S(X) is true for adjacent chunks X and Y. Another equivalent description would be: "If there is no stench in a chunk X, then there is no Wumpus in the (adjacent) chunk Y."
+    * Aw(X, Y) is the action, that takes two chunks as arguments.
+        * ADJ(X, Y) is the pre-predicate, which tells us the actions can only be called parameters X and Y, which are adjacent chunks
+            * Note: if there are more pre-predicates available, they are separated by commas
+        * !S(X) |= !W(Y) is the simplified entailment statement (!S(X) is the predicate and !W(Y) is the conclusion)
+            * Note: if there is no predicate in the action, we would write it as: |= F(X)
+    * What this action does, is it adds !W(Y) to our KB, when !S(X) is true for adjacent chunks X and Y. Another equivalent description would be: "If there is no stench in a chunk X, then there is no Wumpus in the (adjacent) chunk Y."
 
 Actions are called the way they are because they actually do something - they broaden the horizon of our KB by adding facts to it.
 
@@ -184,7 +184,7 @@ We can now summarize the list of actions and figure out, when a certain action n
 
 | Action | Invocation | Parameters |
 | ------ | ---------- | ---------- |
-| Aw0 	 | When the arrow is shot (but Wumpus isn't killed) | All chunks the arrow was shot through |
+| Aw0      | When the arrow is shot (but Wumpus isn't killed) | All chunks the arrow was shot through |
 | Aw1    | When Wumpus gets killed | All chunks |
 | Aw2    | When Wumpus is located  | All chunks except the chunk with Wumpus |
 | Aw3    | When a chunk with no stench is discovered | X = the chunk the player moved into <br> Y = all (undiscovered) adjacent chunks |

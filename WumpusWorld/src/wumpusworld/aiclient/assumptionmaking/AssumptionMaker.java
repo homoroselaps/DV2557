@@ -9,13 +9,13 @@ import wumpusworld.aiclient.util.Disposable;
 public interface AssumptionMaker extends Disposable {
 
 
-	boolean isDone();
+    boolean isDone();
 
 
-	void init();
+    void init();
 
 
-	void updateAll();
+    void updateAll();
 
 
 }

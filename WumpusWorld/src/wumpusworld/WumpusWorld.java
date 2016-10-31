@@ -95,7 +95,7 @@ public class WumpusWorld {
     private int runSimulation(World w)
     {
         int actions = 0;
-        Agent a = new MyAgent(w);
+        Agent a = new LogicAgent(w);
         while (!w.gameOver())
         {
             a.doAction();

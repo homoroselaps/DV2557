@@ -29,147 +29,147 @@ public class PitAssumptionMaker implements AssumptionMaker {
 
 
 
-	private final WorldModel worldModel;
-	private HashMap<EventHandler<?>, EventInterface<?>> listeners;
-	private boolean done;
+    private final WorldModel worldModel;
+    private HashMap<EventHandler<?>, EventInterface<?>> listeners;
+    private boolean done;
 
 
 
 
-	public WorldModel getWorldModel() {
-		return worldModel;
-	}
+    public WorldModel getWorldModel() {
+        return worldModel;
+    }
 
 
-	public boolean isDone() {
-		return done;
-	}
-
-
-
-
-	public PitAssumptionMaker(WorldModel worldModel) {
-		Objects.requireNonNull(worldModel);
-		this.worldModel = worldModel;
-	}
+    public boolean isDone() {
+        return done;
+    }
 
 
 
 
-	@Override
-	public void init() {
-		updateAll();
-	}
-
-
-	@Override
-	public void updateAll() {
-		done = false;
-		subscribe();
-
-		initChunkWithNoBreezeDiscovered();
-		if (done) return;
-		initChunkWithBreezeHasONlyOneAdjacentChunkWitPit();
-	}
-
-
-	@Override
-	public void dispose() {
-		unsubscribe();
-	}
-
-
-	private void subscribe() {
-		if (listeners != null)
-			unsubscribe();
-
-		listeners = new HashMap<>(1);
-
-		EventHandler<Chunk> chunkExploredEventHandler = (sender, arg) -> onChunkExplored(arg);
-		worldModel.getChunkExploredEvent().subscribe(chunkExploredEventHandler);
-		listeners.put(chunkExploredEventHandler, worldModel.getActionEvent());
-	}
-
-
-	private void unsubscribe() {
-		if (listeners != null)
-			listeners.entrySet().forEach(pair -> pair.getValue().unsubscribe(pair.getKey()));
-		listeners = null; // let GC do its work
-	}
-
-
-	private void checkDone() {
-		done = Arrays.stream(worldModel.getChunks())
-				.allMatch(chunk -> chunk.getPercepts().getPit() != UNKNOWN);
-	}
+    public PitAssumptionMaker(WorldModel worldModel) {
+        Objects.requireNonNull(worldModel);
+        this.worldModel = worldModel;
+    }
 
 
 
 
-	private void onChunkExplored(Chunk chunk) {
-		invokeChunkWithNoBreezeDiscovered(chunk);
-		invokeChunkWithBreezeHasOnlyOneAdjacentChunkWithPit(chunk, true);
-	}
+    @Override
+    public void init() {
+        updateAll();
+    }
+
+
+    @Override
+    public void updateAll() {
+        done = false;
+        subscribe();
+
+        initChunkWithNoBreezeDiscovered();
+        if (done) return;
+        initChunkWithBreezeHasONlyOneAdjacentChunkWitPit();
+    }
+
+
+    @Override
+    public void dispose() {
+        unsubscribe();
+    }
+
+
+    private void subscribe() {
+        if (listeners != null)
+            unsubscribe();
+
+        listeners = new HashMap<>(1);
+
+        EventHandler<Chunk> chunkExploredEventHandler = (sender, arg) -> onChunkExplored(arg);
+        worldModel.getChunkExploredEvent().subscribe(chunkExploredEventHandler);
+        listeners.put(chunkExploredEventHandler, worldModel.getActionEvent());
+    }
+
+
+    private void unsubscribe() {
+        if (listeners != null)
+            listeners.entrySet().forEach(pair -> pair.getValue().unsubscribe(pair.getKey()));
+        listeners = null; // let GC do its work
+    }
+
+
+    private void checkDone() {
+        done = Arrays.stream(worldModel.getChunks())
+                .allMatch(chunk -> chunk.getPercepts().getPit() != UNKNOWN);
+    }
 
 
 
 
-	private void initChunkWithNoBreezeDiscovered() {
-		Arrays.stream(worldModel.getChunks())
-				.filter(chunk -> chunk.getPercepts().getBreeze() == FALSE)
-				.forEach(this::invokeChunkWithNoBreezeDiscovered);
-	}
-
-
-	private void initChunkWithBreezeHasONlyOneAdjacentChunkWitPit() {
-		Arrays.stream(worldModel.getChunks())
-				.filter(chunk -> chunk.getPercepts().getBreeze() == TRUE)
-				.forEach(chunk -> invokeChunkWithBreezeHasOnlyOneAdjacentChunkWithPit(chunk, true));
-	}
+    private void onChunkExplored(Chunk chunk) {
+        invokeChunkWithNoBreezeDiscovered(chunk);
+        invokeChunkWithBreezeHasOnlyOneAdjacentChunkWithPit(chunk, true);
+    }
 
 
 
 
-	private void invokeChunkWithNoBreezeDiscovered(Chunk chunk) {
-		if (chunk.getPercepts().getBreeze() == FALSE)
-			onChunkWithNoBreezeDiscovered(chunk);
-	}
+    private void initChunkWithNoBreezeDiscovered() {
+        Arrays.stream(worldModel.getChunks())
+                .filter(chunk -> chunk.getPercepts().getBreeze() == FALSE)
+                .forEach(this::invokeChunkWithNoBreezeDiscovered);
+    }
 
 
-	private void invokeChunkWithBreezeHasOnlyOneAdjacentChunkWithPit(Chunk chunk, boolean subscribe) {
-		if (chunk.getPercepts().getBreeze() != TRUE) return;
-
-		Optional<Chunk> theOnlyOne = chunk.getOnlyAdjacentChunkWithSatisfiablePercept(PIT);
-		if (theOnlyOne.isPresent()) {
-			onChunkWithBreezeHasOnlyOneAdjacentChunkWithPit(theOnlyOne.get());
-		} else if (subscribe) {
-			Arrays.stream(chunk.getAdjacent())
-					.filter(c -> c.getPercepts().getBreeze().isSatisfiable())
-					.forEach(c -> {
-						EventHandler<PerceptChanged> perceptChangedEventHandler = (sender, arg) -> {
-							if (arg.getPercept() == PIT && arg.getNewValue() == FALSE)
-								invokeChunkWithBreezeHasOnlyOneAdjacentChunkWithPit(chunk, false);
-						};
-						c.getPercepts().getPerceptChangedEvent().subscribe(perceptChangedEventHandler);
-						listeners.put(perceptChangedEventHandler, c.getPercepts().getPerceptChangedEvent());
-					});
-		}
-	}
+    private void initChunkWithBreezeHasONlyOneAdjacentChunkWitPit() {
+        Arrays.stream(worldModel.getChunks())
+                .filter(chunk -> chunk.getPercepts().getBreeze() == TRUE)
+                .forEach(chunk -> invokeChunkWithBreezeHasOnlyOneAdjacentChunkWithPit(chunk, true));
+    }
 
 
 
 
-	private void onChunkWithNoBreezeDiscovered(Chunk chunk) {
-		Arrays.stream(chunk.getAdjacent())
-				.forEach(c -> c.getPercepts().setPit(FALSE));
-		checkDone();
-	}
+    private void invokeChunkWithNoBreezeDiscovered(Chunk chunk) {
+        if (chunk.getPercepts().getBreeze() == FALSE)
+            onChunkWithNoBreezeDiscovered(chunk);
+    }
 
 
-	private void onChunkWithBreezeHasOnlyOneAdjacentChunkWithPit(Chunk adjacentChunk) {
-		adjacentChunk.getPercepts().setPit();
-		checkDone();
-	}
+    private void invokeChunkWithBreezeHasOnlyOneAdjacentChunkWithPit(Chunk chunk, boolean subscribe) {
+        if (chunk.getPercepts().getBreeze() != TRUE) return;
+
+        Optional<Chunk> theOnlyOne = chunk.getOnlyAdjacentChunkWithSatisfiablePercept(PIT);
+        if (theOnlyOne.isPresent()) {
+            onChunkWithBreezeHasOnlyOneAdjacentChunkWithPit(theOnlyOne.get());
+        } else if (subscribe) {
+            Arrays.stream(chunk.getAdjacent())
+                    .filter(c -> c.getPercepts().getBreeze().isSatisfiable())
+                    .forEach(c -> {
+                        EventHandler<PerceptChanged> perceptChangedEventHandler = (sender, arg) -> {
+                            if (arg.getPercept() == PIT && arg.getNewValue() == FALSE)
+                                invokeChunkWithBreezeHasOnlyOneAdjacentChunkWithPit(chunk, false);
+                        };
+                        c.getPercepts().getPerceptChangedEvent().subscribe(perceptChangedEventHandler);
+                        listeners.put(perceptChangedEventHandler, c.getPercepts().getPerceptChangedEvent());
+                    });
+        }
+    }
+
+
+
+
+    private void onChunkWithNoBreezeDiscovered(Chunk chunk) {
+        Arrays.stream(chunk.getAdjacent())
+                .forEach(c -> c.getPercepts().setPit(FALSE));
+        checkDone();
+    }
+
+
+    private void onChunkWithBreezeHasOnlyOneAdjacentChunkWithPit(Chunk adjacentChunk) {
+        adjacentChunk.getPercepts().setPit();
+        checkDone();
+    }
 
 
 }

@@ -8,7 +8,7 @@ package wumpusworld.aiclient.util;
 public interface Disposable {
 
 
-	void dispose();
+    void dispose();
 
 
 }

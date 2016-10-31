@@ -18,77 +18,77 @@ public class AssumptionManager implements Disposable {
 
 
 
-	private final WorldModel worldModel;
-	private final WumpusAssumptionMaker wumpusAssumptionMaker;
-	private final PitAssumptionMaker pitAssumptionMaker;
-	private final GoldAssumptionMaker goldAssumptionMaker;
+    private final WorldModel worldModel;
+    private final WumpusAssumptionMaker wumpusAssumptionMaker;
+    private final PitAssumptionMaker pitAssumptionMaker;
+    private final GoldAssumptionMaker goldAssumptionMaker;
 
 
 
 
-	public WorldModel getWorldModel() {
-		return worldModel;
-	}
+    public WorldModel getWorldModel() {
+        return worldModel;
+    }
 
 
-	public WumpusAssumptionMaker getWumpusAssumptionMaker() {
-		return wumpusAssumptionMaker;
-	}
+    public WumpusAssumptionMaker getWumpusAssumptionMaker() {
+        return wumpusAssumptionMaker;
+    }
 
 
-	public PitAssumptionMaker getPitAssumptionMaker() {
-		return pitAssumptionMaker;
-	}
+    public PitAssumptionMaker getPitAssumptionMaker() {
+        return pitAssumptionMaker;
+    }
 
 
-	public GoldAssumptionMaker getGoldAssumptionMaker() {
-		return goldAssumptionMaker;
-	}
-
-
-
-
-	public AssumptionManager(WorldModel worldModel) {
-		Objects.requireNonNull(worldModel);
-
-		this.worldModel = worldModel;
-		this.wumpusAssumptionMaker = new WumpusAssumptionMaker(worldModel);
-		this.pitAssumptionMaker = new PitAssumptionMaker(worldModel);
-		this.goldAssumptionMaker = new GoldAssumptionMaker(worldModel);
-	}
+    public GoldAssumptionMaker getGoldAssumptionMaker() {
+        return goldAssumptionMaker;
+    }
 
 
 
 
-	public boolean allDone() {
-		return wumpusAssumptionMaker.isDone()
-				&& pitAssumptionMaker.isDone()
-				&& goldAssumptionMaker.isDone();
-	}
+    public AssumptionManager(WorldModel worldModel) {
+        Objects.requireNonNull(worldModel);
 
-
-	public void initAll() {
-		wumpusAssumptionMaker.init();
-		pitAssumptionMaker.init();
-		goldAssumptionMaker.init();
-	}
-
-
-	public void updateAll() {
-		wumpusAssumptionMaker.updateAll();
-		pitAssumptionMaker.updateAll();
-		goldAssumptionMaker.updateAll();
-	}
+        this.worldModel = worldModel;
+        this.wumpusAssumptionMaker = new WumpusAssumptionMaker(worldModel);
+        this.pitAssumptionMaker = new PitAssumptionMaker(worldModel);
+        this.goldAssumptionMaker = new GoldAssumptionMaker(worldModel);
+    }
 
 
 
 
-	@Override
-	public void dispose() {
-		wumpusAssumptionMaker.dispose();
-		pitAssumptionMaker.dispose();
-		goldAssumptionMaker.dispose();
-	}
+    public boolean allDone() {
+        return wumpusAssumptionMaker.isDone()
+                && pitAssumptionMaker.isDone()
+                && goldAssumptionMaker.isDone();
+    }
+
+
+    public void initAll() {
+        wumpusAssumptionMaker.init();
+        pitAssumptionMaker.init();
+        goldAssumptionMaker.init();
+    }
+
+
+    public void updateAll() {
+        wumpusAssumptionMaker.updateAll();
+        pitAssumptionMaker.updateAll();
+        goldAssumptionMaker.updateAll();
+    }
+
+
+
+
+    @Override
+    public void dispose() {
+        wumpusAssumptionMaker.dispose();
+        pitAssumptionMaker.dispose();
+        goldAssumptionMaker.dispose();
+    }
 
 
 }
