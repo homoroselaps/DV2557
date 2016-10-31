@@ -194,12 +194,12 @@ public class GUI implements ActionListener
         mapList = new JComboBox(items);
         mapList.setPreferredSize(new Dimension(180,25));
         buttons.add(mapList);
-        JButton bn = new JButton("New Logic Game");
+        JButton bn = new JButton("New Learning Game");
         bn.setActionCommand("NEW");
         bn.addActionListener(this);
         buttons.add(bn);
-        JButton bnq = new JButton("New Learning Game");
-        bnq.setActionCommand("NEWQ");
+        JButton bnq = new JButton("New Logic Game");
+        bnq.setActionCommand("NEWL");
         bnq.addActionListener(this);
         buttons.add(bnq);
         
@@ -249,6 +249,22 @@ public class GUI implements ActionListener
             updateGame();
         }
         if (e.getActionCommand().equals("NEW"))
+        {
+            String s = (String)mapList.getSelectedItem();
+            if (s.equalsIgnoreCase("Random"))
+            {
+                w = MapGenerator.getRandomMap((int)System.currentTimeMillis()).generateWorld();
+            }
+            else
+            {
+                int i = Integer.parseInt(s);
+                i--;
+                w = maps.get(i).generateWorld();
+            }
+            agent = new LogicAgent(w);
+            updateGame();
+        }
+        if (e.getActionCommand().equals("NEWL"))
         {
             String s = (String)mapList.getSelectedItem();
             if (s.equalsIgnoreCase("Random"))
