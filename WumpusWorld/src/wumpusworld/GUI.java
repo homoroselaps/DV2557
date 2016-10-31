@@ -1,9 +1,14 @@
 package wumpusworld;
 
+import wumpusworld.qlearning.LearningAgent;
+import wumpusworld.qlearning.LearningManager;
+import wumpusworld.qlearning.QTable;
+
 import javax.swing.*;
 import java.awt.event.*;
 import java.awt.*;
 import java.io.File;
+import java.util.Random;
 import java.util.Vector;
 
 /**
@@ -34,6 +39,11 @@ public class GUI implements ActionListener
     private ImageIcon l_player_left;
     private ImageIcon l_player_right;
     
+    private final String LEARNED_MAP_FILE = "learnedMap.json";
+
+    // trainedQtable
+    private QTable<Double> q;
+
     /**
      * Creates and start the GUI.
      */
@@ -180,6 +190,11 @@ public class GUI implements ActionListener
         ba.setActionCommand("AGENT");
         ba.addActionListener(this);
         buttons.add(ba);
+        // add training button
+        JButton bt = new JButton("Train Agent");
+        bt.setActionCommand("TRAIN");
+        bt.addActionListener(this);
+        buttons.add(bt);
         //Add a delimiter
         JLabel l = new JLabel("");
         l.setPreferredSize(new Dimension(200,25));
@@ -257,17 +272,29 @@ public class GUI implements ActionListener
                 i--;
                 w = maps.get(i).generateWorld();
             }
-            agent = new MyAgent(w);
+            QTable<Double> q = new QTable<>(0.0);
+            q.readTable(LEARNED_MAP_FILE);
+            agent = new LearningAgent(w, q, new Random(42), 0.2, 0.7, 0.0, 0);
+            //agent = new MyAgent(w);
             updateGame();
         }
         if (e.getActionCommand().equals("AGENT"))
         {
             if (agent == null)
             {
-                agent = new MyAgent(w);
+                QTable<Double> q = new QTable<>(0.0);
+                q.readTable(LEARNED_MAP_FILE);
+                agent = new LearningAgent(w, q, new Random(42), 0.2, 0.7, 0.0, 0);
+                //agent = new MyAgent(w);
             }
             agent.doAction();
             updateGame();
+        }
+        if (e.getActionCommand().equals("TRAIN")) {
+            q = new QTable<Double>(0.0);
+            LearningManager.learn(LEARNED_MAP_FILE, w);
+            q.readTable(LEARNED_MAP_FILE);
+            agent = new LearningAgent(w, q, new Random(42), 0.2, 0.7, 0.0, 0);
         }
     }
     
