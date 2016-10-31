@@ -1,9 +1,14 @@
 package wumpusworld;
 
+import wumpusworld.qlearning.LearningAgent;
+import wumpusworld.qlearning.LearningManager;
+import wumpusworld.qlearning.QTable;
+
 import javax.swing.*;
 import java.awt.event.*;
 import java.awt.*;
 import java.io.File;
+import java.util.Random;
 import java.util.Vector;
 
 /**
@@ -34,6 +39,11 @@ public class GUI implements ActionListener
     private ImageIcon l_player_left;
     private ImageIcon l_player_right;
     
+    private final String LEARNED_MAP_FILE = "learnedMap.json";
+
+    // trainedQtable
+    private QTable<Double> q;
+
     /**
      * Creates and start the GUI.
      */
@@ -194,11 +204,16 @@ public class GUI implements ActionListener
         mapList = new JComboBox(items);
         mapList.setPreferredSize(new Dimension(180,25));
         buttons.add(mapList);
-        JButton bn = new JButton("New Learning Game");
+        JButton bn = new JButton("New Learning Agent");
         bn.setActionCommand("NEW");
         bn.addActionListener(this);
         buttons.add(bn);
-        JButton bnq = new JButton("New Logic Game");
+        // add training button
+        JButton bt = new JButton("Train Learning Agent on Map");
+        bt.setActionCommand("TRAIN");
+        bt.addActionListener(this);
+        buttons.add(bt);
+        JButton bnq = new JButton("New Logic Agent");
         bnq.setActionCommand("NEWL");
         bnq.addActionListener(this);
         buttons.add(bnq);
@@ -261,7 +276,10 @@ public class GUI implements ActionListener
                 i--;
                 w = maps.get(i).generateWorld();
             }
-            agent = new LogicAgent(w);
+            QTable<Double> q = new QTable<>(0.0);
+            q.readTable(LEARNED_MAP_FILE);
+            agent = new LearningAgent(w, q, new Random(42), 0.2, 0.7, 0.0, 0);
+            //agent = new MyAgent(w);
             updateGame();
         }
         if (e.getActionCommand().equals("NEWL"))
@@ -288,6 +306,11 @@ public class GUI implements ActionListener
             }
             agent.doAction();
             updateGame();
+        }
+        if (e.getActionCommand().equals("TRAIN")) {
+            q = new QTable<Double>(0.0);
+            LearningManager.learn(LEARNED_MAP_FILE, w);
+            q.readTable(LEARNED_MAP_FILE);
         }
     }
     
