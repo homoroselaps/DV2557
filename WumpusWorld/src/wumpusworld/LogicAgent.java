@@ -15,7 +15,9 @@ import java.util.Comparator;
 import static wumpusworld.aiclient.Action.TURN_RIGHT;
 import static wumpusworld.aiclient.model.TFUValue.*;
 
-
+/**
+ * In the LogicAgent class, logic and moving of our Agent are defined
+ */
 public class LogicAgent implements Agent {
 
 
@@ -42,7 +44,7 @@ public class LogicAgent implements Agent {
         while (CurrentDirection != playerDirection) {
 
             worldModel.doAction(TURN_RIGHT);
-            CurrentDirection  =worldModel.getPlayerDirection();
+            CurrentDirection = worldModel.getPlayerDirection();
         }
 
     }
@@ -67,7 +69,7 @@ public class LogicAgent implements Agent {
 
 
     /**
-     * Discovers thing about Chunks on the map when there are  no more safe Chunks
+     * Discovers new percepts about Chunks on the map when there are  no more safe Chunks
      *
      * @param safeNeighbours  List that gets filled with safe Chunks to visit, in this case the one with the gold
      * @param unknownChunks   List that gets filled with Chunks that are unknown to us if they are safe or not
@@ -253,8 +255,8 @@ public class LogicAgent implements Agent {
 
         mapSearch(safeNeighbours, unknownChunks, dangerousChunks);
         /**
-        * We are sorting an List of Unknown Chunks, so we can visit the closest
-        */
+         * We are sorting an List of Unknown Chunks, so we can visit the closest
+         */
         Comparator<Chunk> comp = (Chunk a, Chunk b) -> b.compareDistances(a);
         Collections.sort(unknownChunks, comp);
 
