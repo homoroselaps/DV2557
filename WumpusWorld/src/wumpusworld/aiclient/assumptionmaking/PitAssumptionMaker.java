@@ -21,7 +21,7 @@ import static wumpusworld.aiclient.model.TFUValue.UNKNOWN;
 
 
 /**
- * Makes assumptions on where pits may be located.
+ * Makes assumptions associated with pits.
  * Created by Nejc on 17. 10. 2016.
  */
 public class PitAssumptionMaker implements AssumptionMaker {
@@ -36,11 +36,21 @@ public class PitAssumptionMaker implements AssumptionMaker {
 
 
 
+    /**
+     * Gets associated {@link WorldModel}.
+     *
+     * @return Associated {@link WorldModel}.
+     */
     public WorldModel getWorldModel() {
         return worldModel;
     }
 
 
+    /**
+     * Checks if this component has finished with its work.
+     *
+     * @return Whether or not this component has finished with its work.
+     */
     public boolean isDone() {
         return done;
     }
@@ -48,6 +58,11 @@ public class PitAssumptionMaker implements AssumptionMaker {
 
 
 
+    /**
+     * Creates a new instance of {@link PitAssumptionMaker}.
+     *
+     * @param worldModel Associated {@link WorldModel}.
+     */
     public PitAssumptionMaker(WorldModel worldModel) {
         Objects.requireNonNull(worldModel);
         this.worldModel = worldModel;
@@ -56,15 +71,22 @@ public class PitAssumptionMaker implements AssumptionMaker {
 
 
 
+    /**
+     * Initializes the component.
+     */
     @Override
     public void init() {
-        updateAll();
+        update();
     }
 
 
+    /**
+     * Forces component to update its knowledge base and subscriptions to events.
+     */
     @Override
-    public void updateAll() {
+    public void update() {
         done = false;
+        unsubscribe(); // re-subscribe
         subscribe();
 
         initChunkWithNoBreezeDiscovered();
@@ -73,12 +95,18 @@ public class PitAssumptionMaker implements AssumptionMaker {
     }
 
 
+    /**
+     * Disposes the component.
+     */
     @Override
     public void dispose() {
         unsubscribe();
     }
 
 
+    /**
+     * Subscribes to appropriate events.
+     */
     private void subscribe() {
         if (listeners != null)
             unsubscribe();
@@ -91,6 +119,9 @@ public class PitAssumptionMaker implements AssumptionMaker {
     }
 
 
+    /**
+     * Unsubscribes from all subscribed events.
+     */
     private void unsubscribe() {
         if (listeners != null)
             listeners.entrySet().forEach(pair -> pair.getValue().unsubscribe(pair.getKey()));
@@ -98,14 +129,24 @@ public class PitAssumptionMaker implements AssumptionMaker {
     }
 
 
+    /**
+     * Checks if the component has finished its work.
+     */
     private void checkDone() {
         done = Arrays.stream(worldModel.getChunks())
                 .allMatch(chunk -> chunk.getPercepts().getPit() != UNKNOWN);
+        if (done)
+            unsubscribe();
     }
 
 
 
 
+    /**
+     * Event Handler. Called whenever a new {@link Chunk} is explored.
+     *
+     * @param chunk {@link Chunk} explored.
+     */
     private void onChunkExplored(Chunk chunk) {
         invokeChunkWithNoBreezeDiscovered(chunk);
         invokeChunkWithBreezeHasOnlyOneAdjacentChunkWithPit(chunk, true);
@@ -143,6 +184,7 @@ public class PitAssumptionMaker implements AssumptionMaker {
         if (theOnlyOne.isPresent()) {
             onChunkWithBreezeHasOnlyOneAdjacentChunkWithPit(theOnlyOne.get());
         } else if (subscribe) {
+            // We need to subscribe to appropriate events to detect when this chunk will have only one adjacent chunk with breeze property left
             Arrays.stream(chunk.getAdjacent())
                     .filter(c -> c.getPercepts().getBreeze().isSatisfiable())
                     .forEach(c -> {

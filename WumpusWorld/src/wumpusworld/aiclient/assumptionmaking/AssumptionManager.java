@@ -2,7 +2,6 @@ package wumpusworld.aiclient.assumptionmaking;
 
 
 import wumpusworld.aiclient.model.WorldModel;
-import wumpusworld.aiclient.util.Disposable;
 
 import java.util.Objects;
 
@@ -10,10 +9,10 @@ import java.util.Objects;
 
 
 /**
- * Makes assumptions on a {@link WorldModel}.
+ * A wrapper that hold together {@link WumpusAssumptionMaker}, {@link PitAssumptionMaker} and {@link GoldAssumptionMaker}.
  * Created by Nejc on 13. 10. 2016.
  */
-public class AssumptionManager implements Disposable {
+public class AssumptionManager implements AssumptionMaker {
 
 
 
@@ -60,29 +59,43 @@ public class AssumptionManager implements Disposable {
 
 
 
-    public boolean allDone() {
+    /**
+     * Checks if all underlying assumption makers are done.
+     *
+     * @return
+     */
+    public boolean isDone() {
         return wumpusAssumptionMaker.isDone()
                 && pitAssumptionMaker.isDone()
                 && goldAssumptionMaker.isDone();
     }
 
 
-    public void initAll() {
+    /**
+     * Initializes all underlying assumption makers.
+     */
+    public void init() {
         wumpusAssumptionMaker.init();
         pitAssumptionMaker.init();
         goldAssumptionMaker.init();
     }
 
 
-    public void updateAll() {
-        wumpusAssumptionMaker.updateAll();
-        pitAssumptionMaker.updateAll();
-        goldAssumptionMaker.updateAll();
+    /**
+     * Updates all underlying assumption makers.
+     */
+    public void update() {
+        wumpusAssumptionMaker.update();
+        pitAssumptionMaker.update();
+        goldAssumptionMaker.update();
     }
 
 
 
 
+    /**
+     * Disposes all underlying assumption makers.
+     */
     @Override
     public void dispose() {
         wumpusAssumptionMaker.dispose();

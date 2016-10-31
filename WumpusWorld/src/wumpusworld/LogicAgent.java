@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 
+import static wumpusworld.aiclient.Action.TURN_RIGHT;
 import static wumpusworld.aiclient.model.TFUValue.*;
 
 
@@ -27,9 +28,24 @@ public class LogicAgent implements Agent {
     public LogicAgent(World world) {
         this.worldModel = new WorldModel(world);
         this.assumptionManager = new AssumptionManager(this.worldModel);
-        this.assumptionManager.initAll();
+        this.assumptionManager.init();
     }
 
+    /**
+     * Turns the player into the desired direction.
+     *
+     * @param playerDirection The desired direction to be turned to.
+     */
+    public void setRightDirection(Direction playerDirection) {
+        Direction CurrentDirection = worldModel.getPlayerDirection();
+
+        while (CurrentDirection != playerDirection) {
+
+            worldModel.doAction(TURN_RIGHT);
+            CurrentDirection  =worldModel.getPlayerDirection();
+        }
+
+    }
 
     /**
      * Discovers if any of our neighbours are safe to visit
@@ -199,7 +215,7 @@ public class LogicAgent implements Agent {
                 vector = neighbours[indexOfNextNeighbour].getLocation().translate(-location.getX(), -location.getY());
                 whereToGo = Direction.setDirectionToGo(vector);
             }
-            worldModel.setRightDirection(whereToGo);
+            setRightDirection(whereToGo);
             worldModel.doAction(Action.MOVE);
             lastKnownLocation = location;
             return;
@@ -211,14 +227,14 @@ public class LogicAgent implements Agent {
             Point vectorToWump = wumpusLocation.translate(-location.getX(), -location.getY());
             if (location.getX() == wumpusLocation.getX() || location.getY() == wumpusLocation.getY()) {
                 whereToGo = Direction.setDirectionToGo(vectorToWump);
-                worldModel.setRightDirection(whereToGo);
+                setRightDirection(whereToGo);
                 worldModel.doAction(Action.SHOOT);
                 return;
             } else {
                 indexOfNextNeighbour = getIndexOfNextNeighbour(neighbours, wumpusLocation, lastKnownLocation);
                 vectorToWump = neighbours[indexOfNextNeighbour].getLocation().translate(-location.getX(), -location.getY());
                 whereToGo = Direction.setDirectionToGo(vectorToWump);
-                worldModel.setRightDirection(whereToGo);
+                setRightDirection(whereToGo);
                 worldModel.doAction(Action.MOVE);
                 lastKnownLocation = location;
                 return;

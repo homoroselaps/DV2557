@@ -443,7 +443,7 @@ public class TestingMain {
                     world.addGold(1, 1);
                     init("Ag3: A chunk with glitter property has been located", new WorldModel(world))
                             .test(worldModel -> {
-                                new AssumptionManager(worldModel).initAll();
+                                new AssumptionManager(worldModel).init();
                                 it("should locate gold in spawn")
                                         .expect(worldModel.getChunk(new Point(0, 0)).getPercepts().getGold())
                                         .toEqual(TRUE);
@@ -488,7 +488,7 @@ public class TestingMain {
                     world.addPit(3, 1);
                     init("Sample test", new WorldModel(world))
                             .test(worldModel -> {
-                                new AssumptionManager(worldModel).initAll();
+                                new AssumptionManager(worldModel).init();
                                 worldModel.doAction(MOVE);
                                 worldModel.doAction(TURN_LEFT);
                                 worldModel.doAction(TURN_LEFT);

@@ -9,7 +9,7 @@ import java.util.Objects;
 
 
 /**
- * Holds data associated with the perceptChanged event in the {@link PerceptCollection}.
+ * Holds data associated with the {@link PerceptCollection#getPerceptChangedEvent()} event.
  * Created by Nejc on 13. 10. 2016.
  */
 public class PerceptChanged {
@@ -24,16 +24,31 @@ public class PerceptChanged {
 
 
 
+    /**
+     * Gets the {@link Percept} that has changed.
+     *
+     * @return The {@link Percept} that has changed.
+     */
     public Percept getPercept() {
         return percept;
     }
 
 
+    /**
+     * Gets the old value for the associated percept.
+     *
+     * @return The old value.
+     */
     public TFUValue getOldValue() {
         return oldValue;
     }
 
 
+    /**
+     * Gets the new value of the associated percept that has replaced the old value.
+     *
+     * @return The new value.
+     */
     public TFUValue getNewValue() {
         return newValue;
     }
@@ -41,6 +56,13 @@ public class PerceptChanged {
 
 
 
+    /**
+     * Creates a new instance of {@link PerceptChanged}.
+     *
+     * @param percept  Associated percept.
+     * @param newValue The old value of the associated percept.
+     * @param oldValue The new value of the associated percept that has replaced the odl value.
+     */
     public PerceptChanged(Percept percept, TFUValue newValue, TFUValue oldValue) {
         Objects.requireNonNull(percept);
         Objects.requireNonNull(newValue);

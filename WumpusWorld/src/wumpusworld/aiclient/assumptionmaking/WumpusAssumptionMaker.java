@@ -25,7 +25,7 @@ import static wumpusworld.aiclient.model.TFUValue.TRUE;
 
 
 /**
- * Makes assumptions on where Wumpus is located.
+ * Makes assumptions associated with pits.
  * Created by Nejc on 14. 10. 2016.
  */
 public class WumpusAssumptionMaker implements AssumptionMaker {
@@ -44,17 +44,32 @@ public class WumpusAssumptionMaker implements AssumptionMaker {
 
 
 
+    /**
+     * Gets associated {@link WorldModel}.
+     *
+     * @return Associated {@link WorldModel}.
+     */
     public WorldModel getWorldModel() {
         return worldModel;
     }
 
 
+    /**
+     * Checks if this component has finished with its work.
+     *
+     * @return Whether or not this component has finished with its work.
+     */
     @Override
     public boolean isDone() {
         return done;
     }
 
 
+    /**
+     * Checks is Wumpus as been located.
+     *
+     * @return {@code true} if Wumpus has been located or killed, false otherwise.
+     */
     public boolean isWumpusLocated() {
         return wumpusLocated;
     }
@@ -62,6 +77,11 @@ public class WumpusAssumptionMaker implements AssumptionMaker {
 
 
 
+    /**
+     * Creates a new instance of {@link WumpusAssumptionMaker}.
+     *
+     * @param worldModel Associated {@link WorldModel}.
+     */
     public WumpusAssumptionMaker(WorldModel worldModel) {
         Objects.requireNonNull(worldModel);
         this.worldModel = worldModel;
@@ -70,16 +90,23 @@ public class WumpusAssumptionMaker implements AssumptionMaker {
 
 
 
+    /**
+     * Initializes the component.
+     */
     @Override
     public void init() {
-        updateAll();
+        update();
     }
 
 
+    /**
+     * Forces component to update its knowledge base and subscriptions to events.
+     */
     @Override
-    public void updateAll() {
+    public void update() {
         done = false;
         wumpusLocated = false;
+        unsubscribe(); // re-subscribe
         subscribe();
 
         initArrowShot();
@@ -98,12 +125,18 @@ public class WumpusAssumptionMaker implements AssumptionMaker {
     }
 
 
+    /**
+     * Disposes the component.
+     */
     @Override
     public void dispose() {
         unsubscribe();
     }
 
 
+    /**
+     * Subscribes to appropriate events.
+     */
     private void subscribe() {
         if (listeners != null)
             unsubscribe();
@@ -126,6 +159,9 @@ public class WumpusAssumptionMaker implements AssumptionMaker {
     }
 
 
+    /**
+     * Unsubscribes from all subscribed events.
+     */
     private void unsubscribe() {
         if (listeners != null)
             listeners.entrySet().forEach(pair -> pair.getValue().unsubscribe(pair.getKey()));
@@ -133,11 +169,17 @@ public class WumpusAssumptionMaker implements AssumptionMaker {
     }
 
 
+    /**
+     * Handles the logic just before the component is about to finish its work.
+     */
     private void onPreDone() {
         unsubscribe();
     }
 
 
+    /**
+     * Handles the logic of component finishing its work.
+     */
     private void onDone() {
         wumpusLocated = true;
         if (!worldModel.isWumpusAlive() || !worldModel.hasArrow()) { // we don't want to terminate the process if Wumpus is still alive or the player, since the player may still shoot it
@@ -149,6 +191,11 @@ public class WumpusAssumptionMaker implements AssumptionMaker {
 
 
 
+    /**
+     * Event Handler. Called whenever an action is played.
+     *
+     * @param action Action played.
+     */
     private void onAction(Action action) {
         if (action == SHOOT) {
             invokeArrowShot();
@@ -157,6 +204,11 @@ public class WumpusAssumptionMaker implements AssumptionMaker {
     }
 
 
+    /**
+     * Event Handler. Called whenever a new {@link Chunk} is explored.
+     *
+     * @param chunk {@link Chunk} explored.
+     */
     private void onChunkExplored(Chunk chunk) {
         invokeWumpusLocated(chunk);
         invokeChunkWithNoStenchDiscovered(chunk);
@@ -165,6 +217,12 @@ public class WumpusAssumptionMaker implements AssumptionMaker {
     }
 
 
+    /**
+     * Event Handler. Called whenever a {@link wumpusworld.aiclient.Percept} of a {@link wumpusworld.aiclient.model.PerceptCollection} in a {@link Chunk} changes.
+     *
+     * @param chunk          {@link Chunk} in which the change has occurred.
+     * @param perceptChanged Data associated with the event.
+     */
     private void onPerceptChanged(Chunk chunk, PerceptChanged perceptChanged) {
         if (done) return;
 
@@ -268,6 +326,7 @@ public class WumpusAssumptionMaker implements AssumptionMaker {
         if (theOnlyOne.isPresent()) {
             onChunkWithStenchHasOnlyOneAdjacentChunkWithWumpusLeft(theOnlyOne.get());
         } else if (subscribe) {
+            // We need to subscribe to appropriate events to detect when this chunk will have only one adjacent chunk with breeze property left
             Arrays.stream(chunk.getAdjacent())
                     .filter(c -> c.getPercepts().getStench().isSatisfiable())
                     .forEach(c -> {

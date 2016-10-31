@@ -15,7 +15,7 @@ import static wumpusworld.aiclient.model.TFUValue.*;
 
 
 /**
- * A collection if percepts.
+ * A collection of {@link Percept}s' values.
  * Created by Nejc on 12. 10. 2016.
  */
 public class PerceptCollection implements Cloneable {
@@ -23,18 +23,18 @@ public class PerceptCollection implements Cloneable {
 
 
 
-    private static final int BREEZE_FALSE_BIT   = 1;
-    private static final int BREEZE_TRUE_BIT    = 1 << 1;
-    private static final int PIT_FALSE_BIT      = 1 << 2;
-    private static final int PIT_TRUE_BIT       = 1 << 3;
-    private static final int STENCH_FALSE_BIT   = 1 << 4;
-    private static final int STENCH_TRUE_BIT    = 1 << 5;
-    private static final int WUMPUS_FALSE_BIT   = 1 << 6;
-    private static final int WUMPUS_TRUE_BIT    = 1 << 7;
-    private static final int GLITTER_FALSE_BIT  = 1 << 8;
-    private static final int GLITTER_TRUE_BIT   = 1 << 9;
-    private static final int GOLD_FALSE_BIT     = 1 << 10;
-    private static final int GOLD_TRUE_BIT      = 1 << 11;
+    private static final int BREEZE_FALSE_BIT = 1;
+    private static final int BREEZE_TRUE_BIT = 1 << 1;
+    private static final int PIT_FALSE_BIT = 1 << 2;
+    private static final int PIT_TRUE_BIT = 1 << 3;
+    private static final int STENCH_FALSE_BIT = 1 << 4;
+    private static final int STENCH_TRUE_BIT = 1 << 5;
+    private static final int WUMPUS_FALSE_BIT = 1 << 6;
+    private static final int WUMPUS_TRUE_BIT = 1 << 7;
+    private static final int GLITTER_FALSE_BIT = 1 << 8;
+    private static final int GLITTER_TRUE_BIT = 1 << 9;
+    private static final int GOLD_FALSE_BIT = 1 << 10;
+    private static final int GOLD_TRUE_BIT = 1 << 11;
 
 
     private int value;
@@ -43,11 +43,21 @@ public class PerceptCollection implements Cloneable {
 
 
 
+    /**
+     * Gets the value that represents percept's states.
+     *
+     * @return The value.
+     */
     public int getValue() {
         return value;
     }
 
 
+    /**
+     * Gets the event that is called whenever a percept's value changes.
+     *
+     * @return
+     */
     public EventInterface<PerceptChanged> getPerceptChangedEvent() {
         return perceptChangedEvent.getInterface();
     }
@@ -55,11 +65,19 @@ public class PerceptCollection implements Cloneable {
 
 
 
+    /**
+     * Creates a new instance of {@link PerceptCollection} with all percepts set to {@link TFUValue#UNKNOWN}.
+     */
     public PerceptCollection() {
         this.value = 0;
     }
 
 
+    /**
+     * Creates a new instance of {@link PerceptCollection} with percepts' values initialized from given value.
+     *
+     * @param value Value representing states of percepts.
+     */
     private PerceptCollection(int value) {
         this.value = value;
     }
@@ -67,6 +85,14 @@ public class PerceptCollection implements Cloneable {
 
 
 
+    /**
+     * Creates a new instance of {@link PerceptCollection} from given {@link World}'s chunk.
+     *
+     * @param world Associated world.
+     * @param x     Chunk's X coordinate.
+     * @param y     Chunk's Y coordinate.
+     * @return A new instane of {@link PerceptCollection}.
+     */
     public static PerceptCollection fromWorld(World world, int x, int y) {
         Objects.requireNonNull(world);
 
@@ -163,6 +189,12 @@ public class PerceptCollection implements Cloneable {
     }
 
 
+    /**
+     * Gets percept's value.
+     *
+     * @param percept The percept.
+     * @return Given percept's value.
+     */
     public TFUValue getPercept(Percept percept) {
         Objects.requireNonNull(percept);
         int falseBitCode = getPerceptFalseBitCode(percept);
@@ -170,6 +202,13 @@ public class PerceptCollection implements Cloneable {
     }
 
 
+    /**
+     * Sets percept's value.
+     *
+     * @param percept The percept.
+     * @param value   The value for the percept.
+     * @return Whether or not the percept's value has changed.
+     */
     public boolean setPercept(Percept percept, TFUValue value) {
         Objects.requireNonNull(percept);
         int falseBitCode = getPerceptFalseBitCode(percept);
@@ -271,6 +310,11 @@ public class PerceptCollection implements Cloneable {
 
 
 
+    /**
+     * Gets a {@link TFUValue} representing safeness deduced from percepts {@link Percept#WUMPUS} and {@link Percept#PIT}.
+     *
+     * @return A conjunction of percepts {@link Percept#WUMPUS} and {@link Percept#PIT}.
+     */
     public TFUValue getSafe() {
         return getWumpus()
                 .negate()
@@ -278,13 +322,22 @@ public class PerceptCollection implements Cloneable {
     }
 
 
+    /**
+     * Checks if this percept collection does not contain Wumpus or pit.
+     *
+     * @return {@code true} if this percept collection does not contains {@link Percept#WUMPUS} or {@link Percept#PIT}, {@code false} otherwise.
+     */
     public boolean isSafe() {
         return getWumpus() == FALSE
                 && getPit() == FALSE;
     }
 
 
-
+    /**
+     * Copies percepts from another percept collection.
+     *
+     * @param other The other percept collectin to copy from.
+     */
     public void copyFrom(PerceptCollection other) {
         Objects.requireNonNull(other);
 
@@ -297,6 +350,11 @@ public class PerceptCollection implements Cloneable {
     }
 
 
+    /**
+     * Clones current instance.
+     *
+     * @return The clone of current instance.
+     */
     @Override
     protected Object clone() {
         return new PerceptCollection(this.value);
@@ -305,6 +363,11 @@ public class PerceptCollection implements Cloneable {
 
 
 
+    /**
+     * Gets the string representation of the current instance.
+     *
+     * @return String representation of the current instance.
+     */
     @Override
     public String toString() {
         String res = "{ ";

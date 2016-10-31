@@ -20,7 +20,7 @@ import static wumpusworld.aiclient.model.TFUValue.*;
 
 
 /**
- * Makes assumptions on where gold is located.
+ * Makes assumptions associated with gold.
  * Created by Nejc on 17. 10. 2016.
  */
 public class GoldAssumptionMaker implements AssumptionMaker {
@@ -37,17 +37,32 @@ public class GoldAssumptionMaker implements AssumptionMaker {
 
 
 
+    /**
+     * Gets associated {@link WorldModel}.
+     *
+     * @return Associated {@link WorldModel}.
+     */
     public WorldModel getWorldModel() {
         return worldModel;
     }
 
 
+    /**
+     * Checks if this component has finished with its work.
+     *
+     * @return Whether or not this component has finished with its work.
+     */
     @Override
     public boolean isDone() {
         return done;
     }
 
 
+    /**
+     * Checks if gold has been located.
+     *
+     * @return {@code true} if gold has been located or picked up, false otherwise.
+     */
     public boolean isGoldLocated() {
         return goldLocated;
     }
@@ -55,6 +70,11 @@ public class GoldAssumptionMaker implements AssumptionMaker {
 
 
 
+    /**
+     * Creates a new instance of {@link GoldAssumptionMaker}.
+     *
+     * @param worldModel Associated {@link WorldModel}.
+     */
     public GoldAssumptionMaker(WorldModel worldModel) {
         Objects.requireNonNull(worldModel);
         this.worldModel = worldModel;
@@ -63,16 +83,23 @@ public class GoldAssumptionMaker implements AssumptionMaker {
 
 
 
+    /**
+     * Initializes the component.
+     */
     @Override
     public void init() {
-        updateAll();
+        update();
     }
 
 
+    /**
+     * Forces component to update its knowledge base and subscriptions to events.
+     */
     @Override
-    public void updateAll() {
+    public void update() {
         done = false;
         goldLocated = false;
+        unsubscribe(); // re-subscribe
         subscribe();
 
         initGoldPickedUp();
@@ -87,12 +114,18 @@ public class GoldAssumptionMaker implements AssumptionMaker {
     }
 
 
+    /**
+     * Disposes the component.
+     */
     @Override
     public void dispose() {
         unsubscribe();
     }
 
 
+    /**
+     * Subscribes to appropriate events.
+     */
     private void subscribe() {
         if (listeners != null)
             unsubscribe();
@@ -115,6 +148,9 @@ public class GoldAssumptionMaker implements AssumptionMaker {
     }
 
 
+    /**
+     * Unsubscribes from all subscribed events.
+     */
     private void unsubscribe() {
         if (listeners != null)
             listeners.entrySet().forEach(pair -> pair.getValue().unsubscribe(pair.getKey()));
@@ -122,11 +158,17 @@ public class GoldAssumptionMaker implements AssumptionMaker {
     }
 
 
+    /**
+     * Handles the logic just before the component is about to finish its work.
+     */
     private void onPreDone() {
         unsubscribe();
     }
 
 
+    /**
+     * Handles the logic of component finishing its work.
+     */
     private void onDone() {
         unsubscribe();
         done = true;
@@ -135,6 +177,11 @@ public class GoldAssumptionMaker implements AssumptionMaker {
 
 
 
+    /**
+     * Event Handler. Called whenever an action is played.
+     *
+     * @param action Action played.
+     */
     private void onAction(Action action) {
         if (action == Action.GRAB) {
             invokeGoldPickedUp();
@@ -142,6 +189,11 @@ public class GoldAssumptionMaker implements AssumptionMaker {
     }
 
 
+    /**
+     * Event Handler. Called whenever a new {@link Chunk} is explored.
+     *
+     * @param chunk {@link Chunk} explored.
+     */
     private void onChunkExplored(Chunk chunk) {
         invokeGlitterDetected(chunk);
         invokeGoldLocated(chunk);
@@ -149,6 +201,12 @@ public class GoldAssumptionMaker implements AssumptionMaker {
     }
 
 
+    /**
+     * Event Handler. Called whenever a {@link wumpusworld.aiclient.Percept} of a {@link wumpusworld.aiclient.model.PerceptCollection} in a {@link Chunk} changes.
+     *
+     * @param chunk          {@link Chunk} in which the change has occurred.
+     * @param perceptChanged Data associated with the event.
+     */
     private void onPerceptChanged(Chunk chunk, PerceptChanged perceptChanged) {
         if (done) return;
 
