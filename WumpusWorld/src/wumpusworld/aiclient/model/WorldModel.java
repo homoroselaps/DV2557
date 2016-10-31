@@ -275,26 +275,6 @@ public class WorldModel implements Cloneable {
     }
 
 
-    public Point getSafeChunks(ArrayList<Chunk> safeNeighbours) {
-        Point wumpusLocation = null;
-        for (int i = 0; i < 4; i++) {
-            for (int j = 0; j < 4; j++) {
-                Point temp = new Point(i, j);
-                if (getChunk(temp).getPercepts().isSafe() && !isVisited(temp)) {
-                    safeNeighbours.add(getChunk(temp));
-                    continue;
-                }
-                if (isWumpusAlive()) {
-                    if (getChunk(temp).getPercepts().getWumpus() == TRUE) {
-                        wumpusLocation = temp;
-                    }
-                }
-
-            }
-        }
-        return wumpusLocation;
-    }
-
 
 
 
