@@ -14,8 +14,11 @@ import java.util.Objects;
 
 /**
  * An internal model of the {@link World}, as perceived by a player. {@link Chunk}s' coordinates are zero-based.
+ * <p>
+ * Created by Nejc on 12. 10. 2016.
  */
 public class WorldModel implements Cloneable {
+
 
 
 

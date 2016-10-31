@@ -8,7 +8,9 @@ import java.util.List;
 
 
 /**
- * Represents an invokable event.
+ * Represents an event with a callback subscription list that.
+ * This class is not thread-safe.
+ * <p>
  * Created by Nejc on 13. 10. 2016.
  */
 public class Event<T> {
@@ -21,6 +23,11 @@ public class Event<T> {
 
 
 
+    /**
+     * Gets a list of all subscribed {@link EventHandler}s.
+     *
+     * @return The subscription list.
+     */
     public List<EventHandler<T>> getCallbacks() {
         return callbacks;
     }
@@ -28,11 +35,19 @@ public class Event<T> {
 
 
 
+    /**
+     * Creates a new instance of the {@link Event}.
+     */
     public Event() {
         callbacks = new ArrayList<>();
     }
 
 
+    /**
+     * Creates a new instance of the {@link Event}.
+     *
+     * @param capacity Expected capacity of the subscription list.
+     */
     public Event(int capacity) {
         callbacks = new ArrayList<>(capacity);
     }
@@ -40,11 +55,22 @@ public class Event<T> {
 
 
 
+    /**
+     * Gets the publicly visible side of the event.
+     *
+     * @return The event's public interface.
+     */
     public EventInterface<T> getInterface() {
         return new EventInterface<>(this);
     }
 
 
+    /**
+     * Invokes all subscribed {@link EventHandler}s.
+     *
+     * @param sender The object that fired the event.
+     * @param args   The arguments associated with the event.
+     */
     public void invoke(Object sender, T args) {
         EventHandler<T>[] eventHandlers = new EventHandler[callbacks.size()]; // create a clone
         callbacks.toArray(eventHandlers);
@@ -55,6 +81,13 @@ public class Event<T> {
     }
 
 
+    /**
+     * Invokes all subscribed {@link EventHandler}s and catches any exceptions.
+     *
+     * @param sender The object that fired the event.
+     * @param args   The arguments associated with the event.
+     * @return Whether or not all subscribers have been successfully invoked.
+     */
     public boolean invokeSafe(Object sender, T args) {
         boolean successful = true;
         for (EventHandler<T> callback : callbacks) {

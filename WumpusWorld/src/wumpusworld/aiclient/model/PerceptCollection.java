@@ -16,6 +16,7 @@ import static wumpusworld.aiclient.model.TFUValue.*;
 
 /**
  * A collection of {@link Percept}s' values.
+ * <p>
  * Created by Nejc on 12. 10. 2016.
  */
 public class PerceptCollection implements Cloneable {

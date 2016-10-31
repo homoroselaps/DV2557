@@ -10,6 +10,7 @@ import java.util.Objects;
 
 /**
  * A wrapper that hold together {@link WumpusAssumptionMaker}, {@link PitAssumptionMaker} and {@link GoldAssumptionMaker}.
+ * <p>
  * Created by Nejc on 13. 10. 2016.
  */
 public class AssumptionManager implements AssumptionMaker {

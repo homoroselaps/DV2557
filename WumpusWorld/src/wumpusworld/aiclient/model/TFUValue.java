@@ -3,6 +3,7 @@ package wumpusworld.aiclient.model;
 
 /**
  * A three-value-type with the values of either TRUE, FALSE or UNDEFINED.
+ * <p>
  * Created by Nejc on 12. 10. 2016.
  */
 public enum TFUValue {

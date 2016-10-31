@@ -21,12 +21,17 @@ import static wumpusworld.aiclient.testing.UnitTests.*;
 
 
 /**
- * Unit Testing
+ * Unit testing for the internal model.
+ * <p>
  * Created by Nejc on 17. 10. 2016.
  */
 public class TestingMain {
 
 
+    /**
+     * Unit testing entry point.
+     * @param args Application arguments.
+     */
     public static void main(String[] args) {
 
         init("TFU value")

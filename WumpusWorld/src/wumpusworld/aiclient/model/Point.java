@@ -3,6 +3,7 @@ package wumpusworld.aiclient.model;
 
 /**
  * An immutable 2-dimensional point.
+ * <p>
  * Created by Nejc on 12. 10. 2016.
  */
 public class Point implements Cloneable {

@@ -26,6 +26,7 @@ import static wumpusworld.aiclient.model.TFUValue.TRUE;
 
 /**
  * Makes assumptions associated with pits.
+ * <p>
  * Created by Nejc on 14. 10. 2016.
  */
 public class WumpusAssumptionMaker implements AssumptionMaker {

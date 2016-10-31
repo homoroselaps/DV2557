@@ -22,6 +22,7 @@ import static wumpusworld.aiclient.model.TFUValue.UNKNOWN;
 
 /**
  * Makes assumptions associated with pits.
+ * <p>
  * Created by Nejc on 17. 10. 2016.
  */
 public class PitAssumptionMaker implements AssumptionMaker {

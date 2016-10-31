@@ -21,6 +21,7 @@ import static wumpusworld.aiclient.model.TFUValue.*;
 
 /**
  * Makes assumptions associated with gold.
+ * <p>
  * Created by Nejc on 17. 10. 2016.
  */
 public class GoldAssumptionMaker implements AssumptionMaker {

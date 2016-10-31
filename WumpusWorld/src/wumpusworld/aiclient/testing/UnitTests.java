@@ -12,7 +12,8 @@ import java.util.function.Supplier;
 
 
 /**
- * Provides simple API for unit testing.
+ * JasmineJS inspired simple unit testing library.
+ * <p>
  * Created by Nejc on 17. 10. 2016.
  */
 public class UnitTests {

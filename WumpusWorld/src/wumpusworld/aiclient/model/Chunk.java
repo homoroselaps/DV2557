@@ -12,6 +12,7 @@ import java.util.Optional;
 
 /**
  * Represents a chunk/cell/location on/in a {@link WorldModel}.
+ * <p>
  * Created by Nejc on 12. 10. 2016.
  */
 public class Chunk {

@@ -8,6 +8,7 @@ import wumpusworld.aiclient.util.Disposable;
 
 /**
  * Represents an assumption-making class.
+ * <p>
  * Created by Nejc on 13. 10. 2016.
  */
 public interface AssumptionMaker extends Disposable {

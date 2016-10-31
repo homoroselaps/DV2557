@@ -10,6 +10,7 @@ import java.util.Objects;
 
 /**
  * Holds data associated with the {@link PerceptCollection#getPerceptChangedEvent()} event.
+ * <p>
  * Created by Nejc on 13. 10. 2016.
  */
 public class PerceptChanged {
