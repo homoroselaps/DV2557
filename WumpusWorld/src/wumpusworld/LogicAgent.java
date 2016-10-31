@@ -12,13 +12,17 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 
-import static wumpusworld.aiclient.Action.TURN_RIGHT;
 import static wumpusworld.aiclient.model.TFUValue.*;
+
+
+
 
 /**
  * In the LogicAgent class, logic and moving of our Agent are defined
  */
 public class LogicAgent implements Agent {
+
+
 
 
     private final WorldModel worldModel;
@@ -27,27 +31,40 @@ public class LogicAgent implements Agent {
     private Point lastKnownLocation = new Point();
 
 
+
+
     public LogicAgent(World world) {
         this.worldModel = new WorldModel(world);
         this.assumptionManager = new AssumptionManager(this.worldModel);
         this.assumptionManager.init();
     }
 
+
+
+
     /**
      * Turns the player into the desired direction.
      *
-     * @param playerDirection The desired direction to be turned to.
+     * @param direction The desired direction to be turned to.
      */
-    public void setRightDirection(Direction playerDirection) {
-        Direction CurrentDirection = worldModel.getPlayerDirection();
+    public void setRightDirection(Direction direction) {
+        Direction current = worldModel.getPlayerDirection();
+        if (direction == current)
+            return;
 
-        while (CurrentDirection != playerDirection) {
-
-            worldModel.doAction(TURN_RIGHT);
-            CurrentDirection = worldModel.getPlayerDirection();
+        if (Math.abs(direction.ordinal() - current.ordinal()) == 2) {
+            // opposite
+            worldModel.doAction(Action.TURN_RIGHT);
+            worldModel.doAction(Action.TURN_RIGHT);
+        } else {
+            int diff = current.ordinal() - direction.ordinal();
+            if (diff == -1 || diff == 3) // eg: UP - RIGHT = 0 - 1 = -1, LEFT - UP = 3 - 0 = 3
+                worldModel.doAction(Action.TURN_RIGHT);
+            else
+                worldModel.doAction(Action.TURN_LEFT);
         }
-
     }
+
 
     /**
      * Discovers if any of our neighbours are safe to visit
@@ -91,6 +108,7 @@ public class LogicAgent implements Agent {
         }
     }
 
+
     /**
      * In cases where we find a safe Chunk more than 1 square away from us,
      * this function provides us with index of neighbour where we will move
@@ -130,6 +148,7 @@ public class LogicAgent implements Agent {
         }
         return m;
     }
+
 
     /**
      * Funcation that searches through the Map to find safe Chunks which we shall visit and to find a Wumpus
