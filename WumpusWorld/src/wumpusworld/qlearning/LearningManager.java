@@ -28,11 +28,13 @@ public class LearningManager {
         QTable<Double> q = new QTable<>(0.0);
         int lastScore = 0;
         for (int i = 0; i < times; ++i) {
+            int stepCount = 0;
             World startingWorld = world.cloneWorld();
             // use decreasing probability of random actions for the training
             // with a minimal epsilon value
             Agent a = new LearningAgent(startingWorld, q, new Random(42), 0.2, 0.7, Math.max(0.85 - ((i+1)/(double)times), 0.05), 10);
-            while(!startingWorld.gameOver()) {
+            while(!startingWorld.gameOver() && stepCount < 100000) {
+                stepCount++;
                 a.doAction();
             }
             lastScore = startingWorld.getScore();
