@@ -209,7 +209,7 @@ public class GUI implements ActionListener
         bn.addActionListener(this);
         buttons.add(bn);
         // add training button
-        JButton bt = new JButton("1.2 Train Learning Agent on Map");
+        JButton bt = new JButton("1.2 Train Learning Agent");
         bt.setActionCommand("TRAIN");
         bt.addActionListener(this);
         buttons.add(bt);
