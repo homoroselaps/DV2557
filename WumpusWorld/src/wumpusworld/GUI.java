@@ -204,16 +204,16 @@ public class GUI implements ActionListener
         mapList = new JComboBox(items);
         mapList.setPreferredSize(new Dimension(180,25));
         buttons.add(mapList);
-        JButton bn = new JButton("New Learning Agent");
+        JButton bn = new JButton("1.1 New Learning Agent");
         bn.setActionCommand("NEW");
         bn.addActionListener(this);
         buttons.add(bn);
         // add training button
-        JButton bt = new JButton("Train Learning Agent on Map");
+        JButton bt = new JButton("1.2 Train Learning Agent on Map");
         bt.setActionCommand("TRAIN");
         bt.addActionListener(this);
         buttons.add(bt);
-        JButton bnq = new JButton("New Logic Agent");
+        JButton bnq = new JButton("2. New Logic Agent");
         bnq.setActionCommand("NEWL");
         bnq.addActionListener(this);
         buttons.add(bnq);
@@ -308,17 +308,6 @@ public class GUI implements ActionListener
             updateGame();
         }
         if (e.getActionCommand().equals("TRAIN")) {
-            String s = (String)mapList.getSelectedItem();
-            if (s.equalsIgnoreCase("Random"))
-            {
-                w = MapGenerator.getRandomMap((int)System.currentTimeMillis()).generateWorld();
-            }
-            else
-            {
-                int i = Integer.parseInt(s);
-                i--;
-                w = maps.get(i).generateWorld();
-            }
             LearningManager.learn(LEARNED_MAP_FILE, w);
             if (q == null)
                 q = new QTable<>(0.0);
