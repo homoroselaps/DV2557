@@ -1,4 +1,40 @@
-# Introduction
+# Machine learning based solution
+
+## Learning Agent
+
+The learning agent is based on the Q-Learning algorithm.
+
+That means, that the agent stores utility values for action-state pairs and selects his actions
+based on those utility values. When the agent executes an action in a state, the utility value will be updated
+based on an equation that involves the reward for the action and the expected reward in the next state.
+
+For selecting the action we use a *Epsilon Greedy Action Selection Policy*. With a probability of `epsilon` a random
+action is chosen.  
+Furthermore, we use an exploration counter to count the number an action was taken in a specific state.
+If the random action was selected, we chose an action which was not yet executed in that state at least `explorationCount` times, to ensure that all actions in each states are tried.
+Otherwise we chose the action with the best utility value.
+
+When the Agent runs outside of the training manager the `epsilon` value is zero. However it turned out to be important to keep the same `explorationCount` used while training the agent.
+
+## Q-Table
+
+The table with utility values and counters is stored using the class `QTable`. Instances of `QTable` have an internal HashMap that maps `QKeys` to a generic type that is `double` for the utility values and `Integer` for the counters. The internal HashMap can be loaded and stored in text files from JSON
+formatted text files.
+
+## Learning Manager
+
+The `LearningManager` class has methods that will train agents for one specific map and store the
+learned utility values in a text-file.
+
+Currently when the user clicks on the button for training, the map will be completed multiple
+times. The `epsilon` for gets linearly decreased each time. This way the agent explores primarily the whole state space at the beginning and become later more and more based on the trained utility values. To prevent the agent of 'getting stuck' in an infinite loop of best local actions, `epsilon` never reaches zero.
+
+These parameters work for all maps quite well, meaning that the agent always finds the gold.
+However, this performance does not seem to be very stable. During the development process we often encountered non optimal solutions or very long run time if the agent was not able to find the gold with slightly different reward functions, values for `explorationCount` or `epsilon`.
+
+# Logic based solution
+
+## Introduction
 
 This document will explain:
 
@@ -7,7 +43,7 @@ This document will explain:
 * how assumption-making is implemented in our solution (package `wumpusworld.aiclient.assumptionmaking`)
 
 
-# Internal Model of the Environment
+## Internal Model of the Environment
 
 The Wumpus World can be represented as a grid of cells/fields/chunks, where each chunk contains some (or none) following properties:
 
@@ -39,11 +75,11 @@ Note: stating "A chunk contains X" means X is true for that chunk and "A chunk d
 For more information on three-valued logic, please refer to [this Wikipedia page](https://en.wikipedia.org/wiki/Three-valued_logic).
 
 
-# Assumptions
+## Assumptions
 
 As the environment changes, we need to search for locations of pits, gold and Wumpus. As all properties are unknown at the beginning unknown, we need to check if we can assign a deterministic value to any of properties. Therefore, we need to analyze situations, in which properties can be assigned a deterministic value.
 
-## Locating Wumpus
+### Locating Wumpus
 
 Possibilities of assuming the absence of Wumpus in a certain chunk:
 
@@ -58,7 +94,7 @@ Possibilities of assuming the presence of Wumpus:
 * A chunk with stench property has only one adjacent chunk that may contain Wumpus
 * All chunks but one may not contain Wumpus
 
-## Locating Gold
+### Locating Gold
 
 Possibilities of assuming the absence of gold in a certain chunk:
 
@@ -71,7 +107,7 @@ Possibilities of assuming the presence of gold:
 * A chunk with glitter property has been located
 * All chunks but one may contain gold
 
-## Locating Pits
+### Locating Pits
 
 Possibilities of assuming the absence of pits in a certain chunk:
 
@@ -82,7 +118,7 @@ Possibilities of assuming the presence of pits:
 * A chunk with breeze property has only one adjacent chunk that may contain a pit
 
 
-# Assumption Functions
+## Assumption Functions
 
 Note: since possibilities of assuming absence of presence of pits and gold are simpler or event same as the ones for Wumpus, we are only going to cover those related to Wumpus.
 
@@ -117,7 +153,7 @@ Additionally, 3VL values cannot be converted to Boolean values, but Boolean valu
 * true [Boolean] -> true [3VL]
 * false [Boolean] -> false [3VL]
 
-We cannot get unknown value when converting boolean value to 3LV value. 
+We cannot get unknown value when converting boolean value to 3LV value.
 
 Let's define some terms:
 
@@ -136,7 +172,7 @@ Previously mentioned assumptions (for locating Wumpus) can be rewritten as assum
 * HAS_ONLY(!W) & (ONLY_CELL(!W) == X) => W(X)
 
 
-# Entailment and Actions
+## Entailment and Actions
 
 Let's define |= as entailment operator (X |= Y means Y entails from X).
 
@@ -171,7 +207,7 @@ We can convert previous assumption statements to actions:
 * Aw6(X): |= W(X), HAS_ONLY(!W), ONLY_CELL(!W) == X
 
 
-# Taking Actions
+## Taking Actions
 
 To evaluate the entailment statement in an action, we need to invoke the action. Doing so may expand out KB. But we do not need to invoke every action every turn of the game for every possible input. Instead, according to their pre-predicates, we can determine when certain actions need to be invoked.
 
@@ -195,14 +231,14 @@ We can now summarize the list of actions and figure out, when a certain action n
 Similar actions apply for locating gold and pits.
 
 
-# Conclusion
+## Conclusion
 
 Probably the easiest way of storing our KB is with an internal model of the map, where we represent properties with 3V values.
 
 By transforming our assumptions to actions, we have managed to analyze, when we need to perform certain checks, which may lead to useful conclusions of locating Wumpus, gold or pits.
 
 
-# Implementation
+## Implementation
 
 Should we use any logic-languages to describe our actions? Our implementation needs to fulfil the following two sections: invoking actions and carrying out action's entailment sentence. The first is implementation-dependant and it would make no sense to use any logic-languages to implement it. The second part only contains a simple entailment statement. Checking if it's premise is true only takes one line of code and adding the conclusion to our KB is also implementation-dependant. Therefore it makes no sense to use any logic-languages to implement our actions.
 
