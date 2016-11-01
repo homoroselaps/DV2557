@@ -32,16 +32,21 @@ times. The `epsilon` for gets linearly decreased each time. This way the agent e
 These parameters work for all maps quite well, meaning that the agent always finds the gold.
 However, this performance does not seem to be very stable. During the development process we often encountered non optimal solutions or very long run time if the agent was not able to find the gold with slightly different reward functions, values for `explorationCount` or `epsilon`.
 
+
+
+
 # Logic based solution
 
 ## Introduction
 
-This document will explain:
+The logic-based agent creates a knowledge base of everything that is known. Based on this, it makes decision on what to do next. 
 
-* how we represent and implement an internal model of the environment (package `wumpusworld.aiclient.model`)
-* how we make assumptions (we optimize first order logic by introducing *actions*)
-* how assumption-making is implemented in our solution (package `wumpusworld.aiclient.assumptionmaking`)
+This chapter will explain:
 
+* how we represent and implement an internal model of the environment (package `wumpusworld.aiclient.model`),
+* how we make assumptions (we optimize first order logic by introducing *actions*),
+* how assumption-making is implemented in our solution (package `wumpusworld.aiclient.assumptionmaking`),
+* how the agent's decision-making process works and how this is implemented.
 
 ## Internal Model of the Environment
 
@@ -73,7 +78,6 @@ If we used first order logic and boolean values to represent states of chunks, w
 Note: stating "A chunk contains X" means X is true for that chunk and "A chunk does not contain X" means X is false for that chunk.
 
 For more information on three-valued logic, please refer to [this Wikipedia page](https://en.wikipedia.org/wiki/Three-valued_logic).
-
 
 ## Assumptions
 
@@ -116,7 +120,6 @@ Possibilities of assuming the absence of pits in a certain chunk:
 Possibilities of assuming the presence of pits:
 
 * A chunk with breeze property has only one adjacent chunk that may contain a pit
-
 
 ## Assumption Functions
 
@@ -171,7 +174,6 @@ Previously mentioned assumptions (for locating Wumpus) can be rewritten as assum
 * S(X) & ONLY_ADJ(X, Y, W) => W(Y)
 * HAS_ONLY(!W) & (ONLY_CELL(!W) == X) => W(X)
 
-
 ## Entailment and Actions
 
 Let's define |= as entailment operator (X |= Y means Y entails from X).
@@ -206,7 +208,6 @@ We can convert previous assumption statements to actions:
 * Aw5(X, Y): S(X) |= W(Y), ONLY_ADJ(X, Y, W)
 * Aw6(X): |= W(X), HAS_ONLY(!W), ONLY_CELL(!W) == X
 
-
 ## Taking Actions
 
 To evaluate the entailment statement in an action, we need to invoke the action. Doing so may expand out KB. But we do not need to invoke every action every turn of the game for every possible input. Instead, according to their pre-predicates, we can determine when certain actions need to be invoked.
@@ -230,13 +231,11 @@ We can now summarize the list of actions and figure out, when a certain action n
 
 Similar actions apply for locating gold and pits.
 
-
-## Conclusion
+## Quick Summary of Assumption-making Logic
 
 Probably the easiest way of storing our KB is with an internal model of the map, where we represent properties with 3V values.
 
 By transforming our assumptions to actions, we have managed to analyze, when we need to perform certain checks, which may lead to useful conclusions of locating Wumpus, gold or pits.
-
 
 ## Implementation
 
@@ -271,3 +270,7 @@ For example, let's take a look at the methods associated with Wumpus and Aw3 act
 * `onChunkWithNoStenchIsDiscovered(Chunk chunk)` - add !W(X) to KB, for every X which is an adjacent chunk of the argument `chunk`.
 
 Note: these methods in the assumption-making classes are grouped by their prefix and are listed in the same order as actions are listed in this document.
+
+## Agent's Logic
+
+TODO: Finish
