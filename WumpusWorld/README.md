@@ -1,4 +1,4 @@
-# Machine learning based solution
+﻿# Machine learning based solution
 
 ## Learning Agent
 
@@ -271,6 +271,24 @@ For example, let's take a look at the methods associated with Wumpus and Aw3 act
 
 Note: these methods in the assumption-making classes are grouped by their prefix and are listed in the same order as actions are listed in this document.
 
-## Agent's Logic
+## Moving of the agent
 
-TODO: Finish
+From the logical thinking in the background that triggers on every event, the moving agent is working in the following way:
+
+*It starts by checking if we are currently at the bottom of the pit or if there is any gold at our location, we either climb up or grab the gold and the game is finished
+
+*After that in case there is no breeze or stench at our starting position, we get the neighbours and we can freely move to anyone of them. 
+
+*The agent is always gets current safe neighbours and saves them in a list. If the background logic applies that some fields are safe to visit, our agent will move there to explore.
+
+*There are also some cases in which there are no more fields, about which we can be sure are safe, to explore. 
+
+*If we are able to locate the Wumpus, our current goal will be to shot him and try to move from there. 
+
+*But if we are still unable to get any safe fields to move to, we will just have to take a “leap of faith” to the field that might have a pit. 
+
+*We can’t guarantee that there will be no pits in which we might fall, but if that is our only action to do, we don’t have any other options. 
+
+There is also a case where the stench is present at the starting location:
+
+* In that scenario we will shoot the arrow at the right direction, and we will either kill the Wumpus or we will be absolutely sure that it is located in the field above us. 
