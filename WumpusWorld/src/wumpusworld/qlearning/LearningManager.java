@@ -30,7 +30,8 @@ public class LearningManager {
         for (int i = 0; i < times; ++i) {
             World startingWorld = world.cloneWorld();
             // use decreasing probability of random actions for the training
-            Agent a = new LearningAgent(startingWorld, q, new Random(42), 0.2, 0.7, 1.05 - (i+1)/(double)times, 10);
+            // with a minimal epsilon value
+            Agent a = new LearningAgent(startingWorld, q, new Random(42), 0.2, 0.7, Math.max(0.85 - ((i+1)/(double)times), 0.05), 10);
             while(!startingWorld.gameOver()) {
                 a.doAction();
             }

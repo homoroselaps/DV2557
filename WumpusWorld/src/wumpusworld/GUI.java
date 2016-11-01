@@ -190,11 +190,6 @@ public class GUI implements ActionListener
         ba.setActionCommand("AGENT");
         ba.addActionListener(this);
         buttons.add(ba);
-        // add training button
-        JButton bt = new JButton("Train Agent");
-        bt.setActionCommand("TRAIN");
-        bt.addActionListener(this);
-        buttons.add(bt);
         //Add a delimiter
         JLabel l = new JLabel("");
         l.setPreferredSize(new Dimension(200,25));
@@ -209,10 +204,19 @@ public class GUI implements ActionListener
         mapList = new JComboBox(items);
         mapList.setPreferredSize(new Dimension(180,25));
         buttons.add(mapList);
-        JButton bn = new JButton("New Game");
+        JButton bn = new JButton("New Learning Agent");
         bn.setActionCommand("NEW");
         bn.addActionListener(this);
         buttons.add(bn);
+        // add training button
+        JButton bt = new JButton("Train Learning Agent on Map");
+        bt.setActionCommand("TRAIN");
+        bt.addActionListener(this);
+        buttons.add(bt);
+        JButton bnq = new JButton("New Logic Agent");
+        bnq.setActionCommand("NEWL");
+        bnq.addActionListener(this);
+        buttons.add(bnq);
         
         frame.getContentPane().add(buttons);
         
@@ -278,14 +282,27 @@ public class GUI implements ActionListener
             //agent = new MyAgent(w);
             updateGame();
         }
+        if (e.getActionCommand().equals("NEWL"))
+        {
+            String s = (String)mapList.getSelectedItem();
+            if (s.equalsIgnoreCase("Random"))
+            {
+                w = MapGenerator.getRandomMap((int)System.currentTimeMillis()).generateWorld();
+            }
+            else
+            {
+                int i = Integer.parseInt(s);
+                i--;
+                w = maps.get(i).generateWorld();
+            }
+            agent = new LogicAgent(w);
+            updateGame();
+        }
         if (e.getActionCommand().equals("AGENT"))
         {
             if (agent == null)
             {
-                QTable<Double> q = new QTable<>(0.0);
-                q.readTable(LEARNED_MAP_FILE);
-                agent = new LearningAgent(w, q, new Random(42), 0.2, 0.7, 0.0, 0);
-                //agent = new MyAgent(w);
+                agent = new LogicAgent(w);
             }
             agent.doAction();
             updateGame();
@@ -294,7 +311,6 @@ public class GUI implements ActionListener
             q = new QTable<Double>(0.0);
             LearningManager.learn(LEARNED_MAP_FILE, w);
             q.readTable(LEARNED_MAP_FILE);
-            agent = new LearningAgent(w, q, new Random(42), 0.2, 0.7, 0.0, 0);
         }
     }
     
