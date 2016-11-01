@@ -276,8 +276,8 @@ public class GUI implements ActionListener
                 i--;
                 w = maps.get(i).generateWorld();
             }
-            QTable<Double> q = new QTable<>(0.0);
-            q.readTable(LEARNED_MAP_FILE);
+            if (q == null)
+                q = new QTable<>(0.0);
             agent = new LearningAgent(w, q, new Random(42), 0.2, 0.7, 0.0, 0);
             //agent = new MyAgent(w);
             updateGame();
@@ -308,8 +308,20 @@ public class GUI implements ActionListener
             updateGame();
         }
         if (e.getActionCommand().equals("TRAIN")) {
-            q = new QTable<Double>(0.0);
+            String s = (String)mapList.getSelectedItem();
+            if (s.equalsIgnoreCase("Random"))
+            {
+                w = MapGenerator.getRandomMap((int)System.currentTimeMillis()).generateWorld();
+            }
+            else
+            {
+                int i = Integer.parseInt(s);
+                i--;
+                w = maps.get(i).generateWorld();
+            }
             LearningManager.learn(LEARNED_MAP_FILE, w);
+            if (q == null)
+                q = new QTable<>(0.0);
             q.readTable(LEARNED_MAP_FILE);
         }
     }
