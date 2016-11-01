@@ -1,4 +1,24 @@
-﻿# Machine learning based solution
+﻿### Using the GUI
+
+We implemented both a machine learning solution and a logic based solution.
+Both can be tried out with the GUI in the following way:
+
+__Machine Learning Agent:__
+- open GUI (run WumpusWorld main method)
+- select a map from the dropdown menu
+- click on `1.1 New Learning Agent`
+- click on `1.2 Train Learning Agent on Map`
+- now the Agent is trained for the selected map
+- click on `Run Solving Agent` until he found the gold, to see how the agent solves the map
+
+__Logic Agent:__
+- open GUI (run WumpusWorld main method)
+- select a map from the dropdown menu
+- click on `2. New Logic Agent` to load the Logic Agent instead of the Machine Learning
+Agent
+- click on `Run Solving Agent` until he found the gold, to see how the agent solves the map
+
+# Machine learning based solution
 
 ## Learning Agent
 
